@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 // Mock cohort data
 export async function GET(request: Request) {
   const cohorts = [
     {
-      month: 'Jan 2026',
+      month: "Jan 2026",
       totalRevenue: 1200000,
       customers: 2500,
       avgCustomerValue: 480,
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       retention90: 28,
     },
     {
-      month: 'Feb 2026',
+      month: "Feb 2026",
       totalRevenue: 1350000,
       customers: 2800,
       avgCustomerValue: 482,
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       retention90: 32,
     },
     {
-      month: 'Mar 2026',
+      month: "Mar 2026",
       totalRevenue: 1500000,
       customers: 3100,
       avgCustomerValue: 484,
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       retention90: 35,
     },
     {
-      month: 'Apr 2026',
+      month: "Apr 2026",
       totalRevenue: 1450000,
       customers: 3000,
       avgCustomerValue: 483,

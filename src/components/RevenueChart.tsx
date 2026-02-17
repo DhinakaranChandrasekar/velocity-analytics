@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
 interface RevenueData {
   date: string;
@@ -37,12 +37,12 @@ export function RevenueChart({ startDate, endDate }: RevenueChartProps) {
         });
         const response = await fetch(`/api/metrics?${params}`);
         const result = await response.json();
-        
+
         // Aggregate data weekly for cleaner visualization
         const aggregated = aggregateWeekly(result.data);
         setData(aggregated);
       } catch (error) {
-        console.error('Error fetching metrics:', error);
+        console.error("Error fetching metrics:", error);
       } finally {
         setLoading(false);
       }
@@ -53,9 +53,9 @@ export function RevenueChart({ startDate, endDate }: RevenueChartProps) {
 
   const aggregateWeekly = (data: RevenueData[]) => {
     if (data.length === 0) return [];
-    
+
     const weekly: RevenueData[] = [];
-    let weekSum = { revenue: 0, orders: 0, customers: 0, count: 0, date: '' };
+    let weekSum = { revenue: 0, orders: 0, customers: 0, count: 0, date: "" };
 
     data.forEach((item, index) => {
       weekSum.revenue += item.revenue;
@@ -72,7 +72,7 @@ export function RevenueChart({ startDate, endDate }: RevenueChartProps) {
           orders: Math.floor(weekSum.orders / weekSum.count),
           customers: Math.floor(weekSum.customers / weekSum.count),
         });
-        weekSum = { revenue: 0, orders: 0, customers: 0, count: 0, date: '' };
+        weekSum = { revenue: 0, orders: 0, customers: 0, count: 0, date: "" };
       }
     });
 
@@ -81,34 +81,35 @@ export function RevenueChart({ startDate, endDate }: RevenueChartProps) {
 
   if (loading) {
     return (
-      <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 flex items-center justify-center h-96">
-        <div className="text-slate-400">Loading chart...</div>
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 flex items-center justify-center h-80\">
+        <div className="text-slate-400 text-sm\">Loading chart...</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
-      <h2 className="text-xl font-bold text-white mb-6">Revenue Trend</h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis 
-            dataKey="date" 
+    <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4\">
+      <h2 className="text-sm font-bold text-white mb-4\">Revenue Trend</h2>
+      <ResponsiveContainer width="100%" height={350}>
+        <LineChart
+          data={data}
+          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+          <XAxis
+            dataKey="date"
             stroke="#94a3b8"
-            tick={{ fill: '#94a3b8', fontSize: 12 }}
+            tick={{ fill: "#94a3b8", fontSize: 12 }}
           />
-          <YAxis 
-            stroke="#94a3b8"
-            tick={{ fill: '#94a3b8', fontSize: 12 }}
-          />
+          <YAxis stroke="#94a3b8" tick={{ fill: "#94a3b8", fontSize: 12 }} />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #475569',
-              borderRadius: '8px',
+              backgroundColor: "rgba(15, 23, 42, 0.95)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "12px",
+              backdropFilter: "blur(12px)",
             }}
-            labelStyle={{ color: '#e2e8f0' }}
+            labelStyle={{ color: "#e2e8f0" }}
           />
           <Legend />
           <Line
