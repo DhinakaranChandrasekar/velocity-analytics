@@ -66,20 +66,9 @@ const COLORS = [
 export default function CustomVisualsPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState("");
-  const [charts, setCharts] = useState<CustomChart[]>([
-    {
-      id: "1",
-      title: "Monthly Revenue",
-      type: "line",
-      xField: "month",
-      yField: "revenue",
-      color: "#3b82f6",
-    },
-  ]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [selectedChartId, setSelectedChartId] = useState<string | null>(
-    charts[0]?.id || null,
-  );
+  const [charts, setCharts] = useState<CustomChart[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedChartId, setSelectedChartId] = useState<string | null>(null);
   const [newChartTitle, setNewChartTitle] = useState("");
   const [newChartType, setNewChartType] = useState<
     "line" | "bar" | "pie" | "area"
@@ -107,7 +96,10 @@ export default function CustomVisualsPage() {
   }, []);
 
   const addChart = () => {
-    if (!newChartTitle) (alert("Chart title is required"), { return: "" });
+    if (!newChartTitle) {
+      alert("Chart title is required");
+      return;
+    }
 
     const newChart: CustomChart = {
       id: Date.now().toString(),
@@ -329,57 +321,113 @@ export default function CustomVisualsPage() {
         <main className="relative z-10 flex-1 w-full flex overflow-hidden mt-16">
           {/* Charts Canvas */}
           <div className="flex-1 overflow-auto p-6">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white mb-2">
-                Custom Visuals
-              </h1>
-              <p className="text-slate-400">
-                Build and customize your analytics visualizations
-              </p>
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => router.back()}
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all duration-300 text-slate-300 hover:text-white flex-shrink-0"
+                title="Go back"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  Custom Visuals
+                </h1>
+                <p className="text-slate-400">
+                  Build and customize your analytics visualizations
+                </p>
+              </div>
             </div>
 
-            {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {charts.map((chart) => (
-                <div
-                  key={chart.id}
-                  onClick={() => setSelectedChartId(chart.id)}
-                  className={`bg-white/5 backdrop-blur-xl rounded-2xl border p-6 hover:border-white/30 transition-all duration-300 cursor-pointer ${
-                    selectedChartId === chart.id
-                      ? "border-blue-400/50 ring-1 ring-blue-400/20"
-                      : "border-white/10"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-white">
-                      {chart.title}
-                    </h3>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteChart(chart.id);
-                      }}
-                      className="p-1 hover:bg-red-600/20 rounded transition text-red-400"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  {renderChart(chart)}
+            {/* Empty State */}
+            {charts.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-24">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-full flex items-center justify-center mb-6">
+                  <svg
+                    className="w-12 h-12 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </svg>
                 </div>
-              ))}
-            </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  No Visuals Yet
+                </h3>
+                <p className="text-slate-400 mb-8 text-center max-w-md">
+                  Create your first custom visual to start visualizing your data
+                </p>
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg font-semibold transition"
+                >
+                  + Add Visual
+                </button>
+              </div>
+            )}
+
+            {/* Charts Grid */}
+            {charts.length > 0 && (
+              <div className="grid grid-cols-2 gap-6">
+                {charts.map((chart) => (
+                  <div
+                    key={chart.id}
+                    onClick={() => setSelectedChartId(chart.id)}
+                    className={`bg-white/5 backdrop-blur-xl rounded-2xl border p-6 hover:border-white/30 transition-all duration-300 cursor-pointer ${
+                      selectedChartId === chart.id
+                        ? "border-blue-400/50 ring-1 ring-blue-400/20"
+                        : "border-white/10"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-white">
+                        {chart.title}
+                      </h3>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteChart(chart.id);
+                        }}
+                        className="p-1 hover:bg-red-600/20 rounded transition text-red-400"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    {renderChart(chart)}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right Sidebar */}
