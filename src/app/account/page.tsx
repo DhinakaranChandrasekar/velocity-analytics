@@ -22,6 +22,12 @@ export default function AccountPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
+    router.push("/login");
+  };
+
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     const email = localStorage.getItem("userEmail");
@@ -129,6 +135,7 @@ export default function AccountPage() {
           startDate="2026-01-01"
           endDate="2026-12-31"
           userEmail={userEmail}
+          onLogout={handleLogout}
         />
 
         {/* Page Content */}

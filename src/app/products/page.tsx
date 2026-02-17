@@ -41,6 +41,12 @@ export default function ProductsPage() {
   );
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
+    router.push("/login");
+  };
+
   const [products] = useState<Product[]>([
     {
       id: "1",
@@ -235,6 +241,7 @@ export default function ProductsPage() {
           startDate="2026-01-01"
           endDate="2026-12-31"
           userEmail={userEmail}
+          onLogout={handleLogout}
         />
 
         {/* Page Content */}

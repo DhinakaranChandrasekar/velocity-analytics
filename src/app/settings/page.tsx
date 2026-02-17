@@ -18,6 +18,12 @@ export default function SettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [exportLoading, setExportLoading] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
+    router.push("/login");
+  };
+
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     const email = localStorage.getItem("userEmail");
@@ -153,6 +159,7 @@ export default function SettingsPage() {
           startDate="2026-01-01"
           endDate="2026-12-31"
           userEmail={userEmail}
+          onLogout={handleLogout}
         />
 
         {/* Page Content */}
