@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTheme } from "@/context/ThemeContext";
 import { CustomTooltip } from "./CustomTooltip";
 
 // Generate day-wise data for the entire year with proper growth trajectory
@@ -119,6 +120,7 @@ function aggregateToWeekly(dailyData: any[]) {
 }
 
 export function RevenueTrendChart() {
+  const { theme } = useTheme();
   const dailyData = getMergedData();
 
   // Get unique month labels with their day indices
@@ -133,8 +135,14 @@ export function RevenueTrendChart() {
   const xAxisTicks = Array.from(monthLabels.values());
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 sm:p-5 lg:p-6 transition mb-6">
-      <h3 className="text-sm font-bold text-white mb-6">Revenue Trend</h3>
+    <div className={`backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 transition mb-6 ${
+      theme === "light"
+        ? "bg-slate-100/40 border-slate-300"
+        : "bg-white/5 border-white/10"
+    }`}>
+      <h3 className={`text-sm font-bold mb-6 ${
+        theme === "light" ? "text-slate-700" : "text-white"
+      }`}>Revenue Trend</h3>
       <div style={{ width: "100%", height: "320px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
@@ -153,21 +161,21 @@ export function RevenueTrendChart() {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.05)"
+              stroke={theme === "light" ? "rgba(100,116,139,0.1)" : "rgba(255,255,255,0.05)"}
             />
             <XAxis
               dataKey="month"
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8", fontSize: 12 }}
               ticks={xAxisTicks}
               tickFormatter={(value) => {
                 const item = dailyData[value];
                 return item?.month || "";
               }}
-              stroke="rgba(255,255,255,0.1)"
+              stroke={theme === "light" ? "rgba(100,116,139,0.2)" : "rgba(255,255,255,0.1)"}
             />
             <YAxis
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
-              stroke="rgba(255,255,255,0.1)"
+              tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8", fontSize: 12 }}
+              stroke={theme === "light" ? "rgba(100,116,139,0.2)" : "rgba(255,255,255,0.1)"}
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
             />
             <Tooltip
@@ -176,14 +184,20 @@ export function RevenueTrendChart() {
                 const data = props.payload[0].payload;
 
                 return (
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg p-3 text-xs">
-                    <p className="text-slate-200 font-semibold mb-2">
+                  <div className={`backdrop-blur-xl border rounded-lg p-3 text-xs ${
+                    theme === "light"
+                      ? "bg-white/90 border-slate-300"
+                      : "bg-white/10 border-white/20"
+                  }`}>
+                    <p className={`font-semibold mb-2 ${
+                      theme === "light" ? "text-slate-900" : "text-slate-200"
+                    }`}>
                       {data.date}
                     </p>
-                    <p className="text-blue-400 mb-1">
+                    <p className="text-blue-500 mb-1">
                       2026: ${(data.revenue2026 / 1000).toFixed(1)}K
                     </p>
-                    <p className="text-orange-400">
+                    <p className="text-orange-500">
                       2025: ${(data.revenue2025 / 1000).toFixed(1)}K
                     </p>
                   </div>

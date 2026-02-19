@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTheme } from "@/context/ThemeContext";
 import { MetricCard } from "@/components/MetricCard";
 import { RevenueTrendChart } from "@/components/RevenueTrendChart";
 import { MonthlyRevenueChart } from "@/components/MonthlyRevenueChart";
@@ -20,6 +21,7 @@ interface Summary {
 }
 
 export default function DashboardPage() {
+  const { theme } = useTheme();
   const router = useRouter();
   const [startDate, setStartDate] = useState("2026-01-01");
   const [endDate, setEndDate] = useState("2026-12-31");
@@ -90,7 +92,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex">
+    <div className={`min-h-screen flex ${
+      theme === 'light'
+        ? 'bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50'
+        : 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950'
+    }`}>
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
@@ -103,19 +109,33 @@ export default function DashboardPage() {
 
       {/* Animated Background Orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-10 left-10 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-float"></div>
+        <div className={`absolute top-10 left-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float ${
+          theme === 'light'
+            ? 'bg-blue-300 opacity-5'
+            : 'bg-blue-600 opacity-10'
+        }`}></div>
         <div
-          className="absolute top-40 right-10 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-float"
+          className={`absolute top-40 right-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float ${
+            theme === 'light'
+              ? 'bg-cyan-300 opacity-5'
+              : 'bg-cyan-600 opacity-10'
+          }`}
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute -bottom-32 left-1/2 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-float"
+          className={`absolute -bottom-32 left-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float ${
+            theme === 'light'
+              ? 'bg-indigo-300 opacity-5'
+              : 'bg-indigo-600 opacity-10'
+          }`}
           style={{ animationDelay: "4s" }}
         ></div>
       </div>
 
       {/* Grid Background */}
-      <div className="fixed inset-0 opacity-5 pointer-events-none">
+      <div className={`fixed inset-0 pointer-events-none ${
+        theme === 'light' ? 'opacity-[0.02]' : 'opacity-5'
+      }`}>
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern
@@ -153,7 +173,9 @@ export default function DashboardPage() {
         <main className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-6 mt-20">
           {/* Title & Filter Bar */}
           <div className="mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            <h2 className={`text-2xl sm:text-3xl font-bold mb-4 ${
+              theme === 'light' ? 'text-slate-900' : 'text-white'
+            }`}>
               Dashboard
             </h2>
             <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -163,8 +185,10 @@ export default function DashboardPage() {
                   onClick={() => handleDateRangeChange(range)}
                   className={`px-4 py-2 text-xs sm:text-sm rounded-lg font-medium transition ${
                     range === activeRange
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                      : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
+                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
+                      : theme === 'light'
+                        ? "bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300"
+                        : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
                   }`}
                 >
                   {range === "week"
@@ -185,10 +209,22 @@ export default function DashboardPage() {
               ? [...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6 animate-pulse"
+                    className={`backdrop-blur rounded-xl border p-6 animate-pulse ${
+                      theme === 'light'
+                        ? "bg-slate-200/30 border-slate-300"
+                        : "bg-white/5 border-white/10"
+                    }`}
                   >
-                    <div className="h-4 bg-white/10 rounded w-24 mb-4"></div>
-                    <div className="h-8 bg-white/10 rounded w-32"></div>
+                    <div className={`h-4 rounded w-24 mb-4 ${
+                      theme === 'light'
+                        ? "bg-slate-300/50"
+                        : "bg-white/10"
+                    }`}></div>
+                    <div className={`h-8 rounded w-32 ${
+                      theme === 'light'
+                        ? "bg-slate-300/50"
+                        : "bg-white/10"
+                    }`}></div>
                   </div>
                 ))
               : summary && (
@@ -242,9 +278,15 @@ export default function DashboardPage() {
           </div>
 
           {/* Performance Summary */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 sm:p-5 lg:p-6 hover:border-white/20 transition">
-            <h3 className="text-xs sm:text-sm font-bold text-white mb-4 sm:mb-5 flex items-center gap-2">
-              <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+          <div className={`backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 hover:border-white/20 transition ${
+            theme === 'light'
+              ? "bg-slate-100/40 border-slate-300"
+              : "bg-white/5 border-white/10"
+          }`}>
+            <h3 className={`text-xs sm:text-sm font-bold mb-4 sm:mb-5 flex items-center gap-2 ${
+              theme === 'light' ? 'text-slate-700' : 'text-white'
+            }`}>
+              <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"></div>
               Performance Summary
             </h3>
             <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -272,9 +314,15 @@ export default function DashboardPage() {
               ].map(({ label, value, color }) => (
                 <div
                   key={label}
-                  className="p-3 sm:p-4 bg-white/5 border border-white/5 rounded-lg"
+                  className={`p-3 sm:p-4 border rounded-lg ${
+                    theme === 'light'
+                      ? "bg-slate-200/20 border-slate-300"
+                      : "bg-white/5 border-white/5"
+                  }`}
                 >
-                  <p className="text-slate-400 text-xs mb-1.5">{label}</p>
+                  <p className={`text-xs mb-1.5 ${
+                    theme === 'light' ? 'text-slate-600' : 'text-slate-400'
+                  }`}>{label}</p>
                   <p className={`text-xl sm:text-2xl font-bold ${color}`}>
                     {value}
                   </p>

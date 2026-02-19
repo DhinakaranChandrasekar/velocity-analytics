@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { useTheme } from "@/context/ThemeContext";
 
 interface SidebarProps {
   userEmail: string;
@@ -69,6 +70,7 @@ const menuItems = [
 ];
 
 export function Sidebar({ userEmail }: SidebarProps) {
+  const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -76,15 +78,23 @@ export function Sidebar({ userEmail }: SidebarProps) {
     <>
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white/3 backdrop-blur-2xl border-r border-white/10 transition-[width] duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-screen transition-[width] duration-300 ease-in-out ${
           isOpen ? "w-64" : "w-14"
-        } z-40 overflow-y-auto scrollbar-hide`}
+        } z-40 overflow-y-auto scrollbar-hide ${
+          theme === "light"
+            ? "bg-slate-50/80 backdrop-blur-2xl border-slate-300"
+            : "bg-white/3 backdrop-blur-2xl border-white/10"
+        } border-r`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10 mt-20">
+        <div className={`flex items-center justify-between p-4 border-b transition-colors ${
+          theme === "light"
+            ? "border-slate-300"
+            : "border-white/10"
+        } mt-20`}>
           {isOpen && (
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg">
+              <div className={`p-2 rounded-lg ${theme === "light" ? "bg-gradient-to-br from-blue-500 to-cyan-500" : "bg-gradient-to-br from-blue-600 to-purple-600"}`}>
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -100,20 +110,20 @@ export function Sidebar({ userEmail }: SidebarProps) {
                 </svg>
               </div>
               <div>
-                <h2 className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <h2 className={`text-sm font-bold bg-clip-text text-transparent ${theme === "light" ? "bg-gradient-to-r from-blue-600 to-cyan-600" : "bg-gradient-to-r from-blue-400 to-purple-400"}`}>
                   Velocity
                 </h2>
-                <p className="text-xs text-slate-400">Analytics</p>
+                <p className={`text-xs ${theme === "light" ? "text-slate-600" : "text-slate-400"}`}>Analytics</p>
               </div>
             </div>
           )}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-1 hover:bg-white/10 rounded-lg transition-all duration-300"
+            className={`p-1 rounded-lg transition-all duration-300 ${theme === "light" ? "hover:bg-slate-200" : "hover:bg-white/10"}`}
             title={isOpen ? "Collapse" : "Expand"}
           >
             <svg
-              className="w-5 h-5 text-slate-400 transition-transform duration-500"
+              className={`w-5 h-5 transition-transform duration-500 ${theme === "light" ? "text-slate-600" : "text-slate-400"}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -141,12 +151,16 @@ export function Sidebar({ userEmail }: SidebarProps) {
                 href={item.href}
                 className={`flex items-center ${isOpen ? "justify-start gap-3" : "justify-center"} px-3 py-2.5 rounded-lg transition-all duration-300 ${
                   isActive
-                    ? "bg-gradient-to-r from-blue-600/30 to-purple-600/20 border border-blue-400/40 text-blue-300 shadow-lg shadow-blue-500/10"
-                    : "text-slate-400 hover:bg-white/5 border border-transparent hover:text-slate-200"
+                    ? theme === "light"
+                      ? "bg-blue-100 border border-blue-300 text-blue-700 shadow-lg shadow-blue-200/50"
+                      : "bg-gradient-to-r from-blue-600/30 to-purple-600/20 border border-blue-400/40 text-blue-300 shadow-lg shadow-blue-500/10"
+                    : theme === "light"
+                      ? "text-slate-700 hover:bg-slate-200 border border-transparent hover:text-slate-900"
+                      : "text-slate-400 hover:bg-white/5 border border-transparent hover:text-slate-200"
                 }`}
                 title={!isOpen ? item.label : ""}
               >
-                <div className="flex-shrink-0 text-slate-300">{item.icon}</div>
+                <div className={`flex-shrink-0 ${theme === "light" ? "text-slate-600" : "text-slate-300"}`}>{item.icon}</div>
                 {isOpen && (
                   <span className="text-sm font-medium">{item.label}</span>
                 )}

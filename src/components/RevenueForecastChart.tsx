@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { useTheme } from "@/context/ThemeContext";
 
 // Generate forecast data
 function generateForecastData() {
@@ -68,14 +69,23 @@ function generateForecastData() {
 }
 
 export function RevenueForecastChart() {
+  const { theme } = useTheme();
   const data = generateForecastData();
   const lastActualIndex = 5; // Index of last actual data point
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 sm:p-5 lg:p-6 transition mb-6">
+    <div className={`backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 transition mb-6 ${
+      theme === "light"
+        ? "bg-slate-100/40 border-slate-300"
+        : "bg-white/5 border-white/10"
+    }`}>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-bold text-white">Revenue Forecast</h3>
-        <span className="text-xs text-slate-400">
+        <h3 className={`text-sm font-bold ${
+          theme === "light" ? "text-slate-700" : "text-white"
+        }`}>Revenue Forecast</h3>
+        <span className={`text-xs ${
+          theme === "light" ? "text-slate-500" : "text-slate-400"
+        }`}>
           3-Month Projection with Confidence Intervals
         </span>
       </div>
@@ -105,18 +115,18 @@ export function RevenueForecastChart() {
 
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.05)"
+              stroke={theme === "light" ? "rgba(100,116,139,0.1)" : "rgba(255,255,255,0.05)"}
             />
 
             <XAxis
               dataKey="month"
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
-              stroke="rgba(255,255,255,0.1)"
+              tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8", fontSize: 12 }}
+              stroke={theme === "light" ? "rgba(100,116,139,0.2)" : "rgba(255,255,255,0.1)"}
             />
 
             <YAxis
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
-              stroke="rgba(255,255,255,0.1)"
+              tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8", fontSize: 12 }}
+              stroke={theme === "light" ? "rgba(100,116,139,0.2)" : "rgba(255,255,255,0.1)"}
               tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
             />
 
@@ -127,22 +137,30 @@ export function RevenueForecastChart() {
                 if (!data) return null;
 
                 return (
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg p-3 text-xs">
-                    <p className="text-slate-200 font-semibold mb-2">
+                  <div className={`backdrop-blur-xl border rounded-lg p-3 text-xs ${
+                    theme === "light"
+                      ? "bg-white/90 border-slate-300"
+                      : "bg-white/10 border-white/20"
+                  }`}>
+                    <p className={`font-semibold mb-2 ${
+                      theme === "light" ? "text-slate-900" : "text-slate-200"
+                    }`}>
                       {data.month}
                     </p>
                     {data.type === "actual" ? (
                       <>
-                        <p className="text-blue-400 mb-1">
+                        <p className="text-blue-500 mb-1">
                           Actual: ${(data.revenue / 1000).toFixed(0)}K
                         </p>
                       </>
                     ) : (
                       <>
-                        <p className="text-green-400 font-medium mb-1">
+                        <p className="text-green-500 font-medium mb-1">
                           Forecast: ${(data.forecast / 1000).toFixed(0)}K
                         </p>
-                        <p className="text-slate-300 text-xs">
+                        <p className={`text-xs ${
+                          theme === "light" ? "text-slate-700" : "text-slate-300"
+                        }`}>
                           Range: ${(data.forecastLower / 1000).toFixed(0)}K - $
                           {(data.forecastUpper / 1000).toFixed(0)}K
                         </p>
@@ -197,12 +215,12 @@ export function RevenueForecastChart() {
             {/* Reference line at last actual point */}
             <ReferenceLine
               x={data[lastActualIndex]?.month}
-              stroke="rgba(255,255,255,0.2)"
+              stroke={theme === "light" ? "rgba(100,116,139,0.3)" : "rgba(255,255,255,0.2)"}
               strokeDasharray="3 3"
               label={{
                 value: "Today",
                 position: "top",
-                fill: "#94a3b8",
+                fill: theme === "light" ? "#475569" : "#94a3b8",
                 fontSize: 11,
               }}
             />
