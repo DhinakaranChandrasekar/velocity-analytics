@@ -12,6 +12,11 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
 } from "recharts";
 
 interface Goal {
@@ -202,6 +207,40 @@ const categoryData = [
   { category: "Performance", goals: 1, achieved: 1 },
 ];
 
+// Daily Revenue Data (Cumulative)
+const dailyRevenueData = [
+  { day: "1", actual: 12500, goal: 15000 },
+  { day: "2", actual: 26700, goal: 30000 },
+  { day: "3", actual: 40500, goal: 45000 },
+  { day: "4", actual: 57000, goal: 60000 },
+  { day: "5", actual: 72200, goal: 75000 },
+  { day: "6", actual: 89500, goal: 90000 },
+  { day: "7", actual: 104400, goal: 105000 },
+  { day: "8", actual: 122500, goal: 120000 },
+  { day: "9", actual: 139200, goal: 135000 },
+  { day: "10", actual: 158400, goal: 150000 },
+  { day: "11", actual: 176200, goal: 165000 },
+  { day: "12", actual: 191700, goal: 180000 },
+  { day: "13", actual: 210600, goal: 195000 },
+  { day: "14", actual: 226800, goal: 210000 },
+  { day: "15", actual: 246300, goal: 225000 },
+  { day: "16", actual: 263400, goal: 240000 },
+  { day: "17", actual: 278200, goal: 255000 },
+  { day: "18", actual: 298300, goal: 270000 },
+  { day: "19", actual: 317000, goal: 285000 },
+  { day: "20", actual: 333400, goal: 300000 },
+  { day: "21", actual: 353200, goal: 315000 },
+  { day: "22", actual: 370800, goal: 330000 },
+  { day: "23", actual: 386900, goal: 345000 },
+  { day: "24", actual: 405200, goal: 360000 },
+  { day: "25", actual: 425700, goal: 375000 },
+  { day: "26", actual: 443600, goal: 390000 },
+  { day: "27", actual: 462800, goal: 405000 },
+  { day: "28", actual: 481400, goal: 420000 },
+  { day: "29", actual: 502500, goal: 435000 },
+  { day: "30", actual: 522300, goal: 450000 },
+];
+
 export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>(initialGoals);
   const [showAddGoal, setShowAddGoal] = useState(false);
@@ -217,7 +256,6 @@ export default function GoalsPage() {
   const handleAddGoal = () => {
     if (newGoal.title && newGoal.target) {
       if (editingId) {
-        // Update existing goal
         setGoals(
           goals.map((g) =>
             g.id === editingId
@@ -233,7 +271,6 @@ export default function GoalsPage() {
         );
         setEditingId(null);
       } else {
-        // Create new goal
         const goal: Goal = {
           id: Date.now().toString(),
           title: newGoal.title,
@@ -276,15 +313,8 @@ export default function GoalsPage() {
     setGoals(goals.filter((g) => g.id !== id));
   };
 
-  const onTrackCount = goals.filter((g) => g.status === "on-track").length;
-  const completedCount = goals.filter((g) => g.status === "completed").length;
-  const avgProgress = Math.round(
-    goals.reduce((sum, g) => sum + g.progress, 0) / goals.length,
-  );
-
   return (
     <div className="min-h-screen flex bg-slate-900">
-      {/* Sidebar */}
       <Sidebar userEmail={userEmail} />
 
       <div className="flex-1 flex flex-col">
@@ -297,114 +327,7 @@ export default function GoalsPage() {
             <p className="text-slate-400">Set and track your monthly targets</p>
           </div>
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-white/10 p-6">
-              <p className="text-slate-400 text-sm uppercase tracking-wider mb-2">
-                Total Goals
-              </p>
-              <p className="text-white text-3xl font-bold">{goals.length}</p>
-              <p className="text-slate-500 text-xs mt-2">for this month</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-white/10 p-6">
-              <p className="text-slate-400 text-sm uppercase tracking-wider mb-2">
-                On Track
-              </p>
-              <p className="text-emerald-400 text-3xl font-bold">
-                {onTrackCount}
-              </p>
-              <p className="text-slate-500 text-xs mt-2">progressing well</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-white/10 p-6">
-              <p className="text-slate-400 text-sm uppercase tracking-wider mb-2">
-                Completed
-              </p>
-              <p className="text-blue-400 text-3xl font-bold">
-                {completedCount}
-              </p>
-              <p className="text-slate-500 text-xs mt-2">achieved</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-white/10 p-6">
-              <p className="text-slate-400 text-sm uppercase tracking-wider mb-2">
-                Avg Progress
-              </p>
-              <p className="text-white text-3xl font-bold">{avgProgress}%</p>
-              <p className="text-slate-500 text-xs mt-2">across all goals</p>
-            </div>
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            {/* Status Distribution */}
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-white/10 p-6">
-              <h2 className="text-white font-semibold mb-4">
-                Goal Status Distribution
-              </h2>
-              <div className="h-48 flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={statusChartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {statusChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                {statusChartData.map((item) => (
-                  <div key={item.name} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-slate-300 text-sm">
-                      {item.name}:{" "}
-                      <span className="text-white font-semibold">
-                        {item.value}
-                      </span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Category Performance */}
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-lg border border-white/10 p-6">
-              <h2 className="text-white font-semibold mb-4">
-                Category Performance
-              </h2>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData}>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "rgba(15, 23, 42, 0.95)",
-                        border: "1px solid rgba(148, 163, 184, 0.2)",
-                        borderRadius: "8px",
-                      }}
-                      labelStyle={{ color: "#e2e8f0" }}
-                    />
-                    <Bar dataKey="achieved" fill="#10b981" name="Achieved" />
-                    <Bar dataKey="goals" fill="#0284c7" name="Total Goals" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Goals Grid */}
+          {/* Goals Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">Your Goals</h2>
@@ -416,269 +339,19 @@ export default function GoalsPage() {
               </button>
             </div>
 
-            {/* Add Goal Form - Modal Popup */}
+            {/* Add Goal Modal */}
             {showAddGoal && (
               <>
-                {/* Backdrop */}
                 <div
-                  className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 transition-opacity"
+                  className="fixed inset-0 bg-black/70 backdrop-blur-md z-40"
                   onClick={() => setShowAddGoal(false)}
                 />
-
-                {/* Modal */}
                 <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                  <div className="bg-gradient-to-br from-slate-800 via-slate-800/95 to-slate-900 rounded-3xl border border-white/10 shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto transform transition-all">
-                    {/* Decorative Background */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-600/10 to-cyan-600/10 rounded-full blur-3xl -z-10" />
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-600/10 to-pink-600/10 rounded-full blur-3xl -z-10" />
-
-                    {/* Modal Header */}
-                    <div className="sticky top-0 bg-gradient-to-r from-blue-600/20 via-slate-800 to-cyan-600/20 backdrop-blur border-b border-white/10 px-8 py-8 flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xl">
-                            <svg
-                              className="w-6 h-6"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle cx="12" cy="12" r="1" />
-                              <path
-                                d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 0l4.24-4.24M1 12h6m6 0h6m-1.78 7.78l-4.24-4.24m-5.08 0l-4.24 4.24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                fill="none"
-                              />
-                            </svg>
-                          </div>
-                          <div>
-                            <h2 className="text-3xl font-bold text-white">
-                              Create New Goal
-                            </h2>
-                          </div>
-                        </div>
-                        <p className="text-slate-400 text-sm ml-0">
-                          Build momentum and track your success
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setShowAddGoal(false)}
-                        className="text-slate-400 hover:text-white transition-all p-2 hover:bg-white/10 rounded-lg hover:scale-110"
-                      >
-                        <svg
-                          className="w-6 h-6"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Modal Content */}
-                    <div className="p-8 space-y-8">
-                      {/* Goal Title */}
-                      <div className="space-y-3">
-                        <label className="flex items-center gap-2 text-white font-bold text-lg">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M11 17H7v2h4v-2zm6-5H1v2h16v-2zm0-4H1v2h16V8zM1 4h16V2H1v2z" />
-                          </svg>
-                          What's your goal?
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g., Increase Monthly Active Users"
-                          value={newGoal.title}
-                          onChange={(e) =>
-                            setNewGoal({ ...newGoal, title: e.target.value })
-                          }
-                          className="w-full bg-gradient-to-r from-slate-700/50 to-slate-700/30 border border-white/15 rounded-xl px-5 py-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all text-lg"
-                        />
-                      </div>
-
-                      {/* Category Selection */}
-                      <div className="space-y-4">
-                        <label className="flex items-center gap-2 text-white font-bold text-lg">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.16-2.66c-.19-.23-.53-.23-.73-.02l-3.05 3.71c-.11.14-.15.33-.1.5.05.16.17.29.32.34.14.05.32.02.44-.08l2.84-3.45 2.16 2.66c.19.23.53.23.73.02l3.68-4.53c.11-.14.15-.33.1-.5-.05-.16-.17-.29-.32-.34-.14-.05-.32-.02-.44.08z" />
-                          </svg>
-                          Choose a category
-                        </label>
-                        <div className="grid grid-cols-3 gap-3">
-                          {[
-                            {
-                              name: "Growth",
-                              icon: getCategoryIcon("Growth"),
-                              color:
-                                "from-emerald-500/20 to-emerald-600/20 border-emerald-500/50 hover:border-emerald-500",
-                            },
-                            {
-                              name: "Revenue",
-                              icon: getCategoryIcon("Revenue"),
-                              color:
-                                "from-yellow-500/20 to-orange-600/20 border-yellow-500/50 hover:border-yellow-500",
-                            },
-                            {
-                              name: "Engagement",
-                              icon: getCategoryIcon("Engagement"),
-                              color:
-                                "from-pink-500/20 to-red-600/20 border-pink-500/50 hover:border-pink-500",
-                            },
-                            {
-                              name: "Operations",
-                              icon: getCategoryIcon("Operations"),
-                              color:
-                                "from-slate-500/20 to-slate-600/20 border-slate-500/50 hover:border-slate-500",
-                            },
-                            {
-                              name: "Product",
-                              icon: getCategoryIcon("Product"),
-                              color:
-                                "from-purple-500/20 to-purple-600/20 border-purple-500/50 hover:border-purple-500",
-                            },
-                            {
-                              name: "Performance",
-                              icon: getCategoryIcon("Performance"),
-                              color:
-                                "from-blue-500/20 to-cyan-600/20 border-blue-500/50 hover:border-blue-500",
-                            },
-                          ].map((cat) => (
-                            <button
-                              key={cat.name}
-                              onClick={() =>
-                                setNewGoal({ ...newGoal, category: cat.name })
-                              }
-                              className={`bg-gradient-to-br ${cat.color} border-2 rounded-xl p-4 transition-all duration-200 ${
-                                newGoal.category === cat.name
-                                  ? "ring-2 ring-white/50 scale-105 shadow-lg shadow-white/10"
-                                  : "hover:scale-102"
-                              }`}
-                            >
-                              <div className="w-8 h-8 mb-2 text-white">
-                                {cat.icon}
-                              </div>
-                              <div className="text-white font-semibold text-sm">
-                                {cat.name}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Target & Unit */}
-                      <div className="grid grid-cols-2 gap-6">
-                        {/* Target Value */}
-                        <div className="space-y-3">
-                          <label className="flex items-center gap-2 text-white font-bold text-lg">
-                            <svg
-                              className="w-5 h-5"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                cx="12"
-                                cy="12"
-                                r="9"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              />
-                              <circle cx="12" cy="12" r="3" />
-                            </svg>
-                            Target
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              placeholder="Enter amount"
-                              value={newGoal.target}
-                              onChange={(e) =>
-                                setNewGoal({
-                                  ...newGoal,
-                                  target: e.target.value,
-                                })
-                              }
-                              className="w-full bg-gradient-to-r from-slate-700/50 to-slate-700/30 border border-white/15 rounded-xl px-5 py-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all text-lg"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Unit Selection */}
-                        <div className="space-y-3">
-                          <label className="flex items-center gap-2 text-white font-bold text-lg">
-                            <svg
-                              className="w-5 h-5"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" />
-                            </svg>
-                            Unit
-                          </label>
-                          <select
-                            value={newGoal.unit}
-                            onChange={(e) =>
-                              setNewGoal({ ...newGoal, unit: e.target.value })
-                            }
-                            className="w-full bg-gradient-to-r from-slate-700/50 to-slate-700/30 border border-white/15 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all text-lg"
-                          >
-                            <option value="users">Users</option>
-                            <option value="$">Dollars ($)</option>
-                            <option value="%">Percentage (%)</option>
-                            <option value="tickets">Tickets</option>
-                            <option value="ms">Milliseconds (ms)</option>
-                            <option value="events">Events</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Summary Preview */}
-                      {newGoal.title && newGoal.target && (
-                        <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                          <p className="text-slate-300 text-sm mb-2 flex items-center gap-2">
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                            </svg>
-                            Your Goal Preview
-                          </p>
-                          <p className="text-white font-semibold text-lg">
-                            Achieve{" "}
-                            <span className="text-blue-400">
-                              {parseInt(newGoal.target).toLocaleString() ||
-                                "___"}
-                            </span>{" "}
-                            <span className="text-cyan-400">
-                              {newGoal.unit}
-                            </span>{" "}
-                            in{" "}
-                            <span className="text-emerald-400">
-                              {newGoal.category}
-                            </span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Modal Footer */}
-                    <div className="border-t border-white/10 bg-gradient-to-r from-slate-900/50 to-slate-800/50 backdrop-blur px-8 py-6 flex gap-3 justify-end">
+                  <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-white/10 shadow-2xl w-full max-w-2xl p-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold text-white">
+                        {editingId ? "Update Goal" : "Create Goal"}
+                      </h2>
                       <button
                         onClick={() => {
                           setShowAddGoal(false);
@@ -690,23 +363,121 @@ export default function GoalsPage() {
                             unit: "users",
                           });
                         }}
-                        className="px-6 py-3 rounded-lg border border-white/15 text-white hover:bg-white/5 font-semibold transition-all hover:border-white/30 hover:shadow-lg"
+                        className="text-slate-400 hover:text-white"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white font-semibold mb-2">
+                          Goal Title
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., Increase Revenue"
+                          value={newGoal.title}
+                          onChange={(e) =>
+                            setNewGoal({ ...newGoal, title: e.target.value })
+                          }
+                          className="w-full bg-slate-700/50 border border-white/15 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-semibold mb-2">
+                          Category
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            "Growth",
+                            "Revenue",
+                            "Engagement",
+                            "Operations",
+                            "Product",
+                            "Performance",
+                          ].map((cat) => (
+                            <button
+                              key={cat}
+                              onClick={() =>
+                                setNewGoal({ ...newGoal, category: cat })
+                              }
+                              className={`p-2 rounded-lg border transition-all ${
+                                newGoal.category === cat
+                                  ? "border-blue-500 bg-blue-500/20"
+                                  : "border-white/15 bg-white/5 hover:border-white/30"
+                              }`}
+                            >
+                              <div className="w-5 h-5 mx-auto mb-1">
+                                {getCategoryIcon(cat)}
+                              </div>
+                              <span className="text-xs text-white">{cat}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-white font-semibold mb-2">
+                            Target
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="Amount"
+                            value={newGoal.target}
+                            onChange={(e) =>
+                              setNewGoal({
+                                ...newGoal,
+                                target: e.target.value,
+                              })
+                            }
+                            className="w-full bg-slate-700/50 border border-white/15 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white font-semibold mb-2">
+                            Unit
+                          </label>
+                          <select
+                            value={newGoal.unit}
+                            onChange={(e) =>
+                              setNewGoal({ ...newGoal, unit: e.target.value })
+                            }
+                            className="w-full bg-slate-700/50 border border-white/15 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                          >
+                            <option value="users">Users</option>
+                            <option value="$">Dollars ($)</option>
+                            <option value="%">Percentage (%)</option>
+                            <option value="tickets">Tickets</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 justify-end mt-6">
+                      <button
+                        onClick={() => {
+                          setShowAddGoal(false);
+                          setEditingId(null);
+                          setNewGoal({
+                            title: "",
+                            category: "Growth",
+                            target: "",
+                            unit: "users",
+                          });
+                        }}
+                        className="px-4 py-2 rounded-lg border border-white/15 text-white hover:bg-white/5"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleAddGoal}
                         disabled={!newGoal.title || !newGoal.target}
-                        className="px-8 py-3 rounded-lg bg-gradient-to-r from-blue-600 via-blue-600 to-cyan-600 hover:from-blue-700 hover:via-blue-700 hover:to-cyan-700 text-white font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-500/40 hover:shadow-blue-500/60 hover:scale-105 disabled:hover:scale-100 flex items-center gap-2 justify-center"
+                        className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50"
                       >
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-                        </svg>
-                        {editingId ? "Update Goal" : "Create Goal"}
+                        {editingId ? "Update" : "Create"}
                       </button>
                     </div>
                   </div>
@@ -716,7 +487,7 @@ export default function GoalsPage() {
 
             {/* Goal Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {goals.map((goal: Goal) => (
+              {goals.map((goal) => (
                 <GoalCard
                   key={goal.id}
                   {...goal}
@@ -724,6 +495,111 @@ export default function GoalsPage() {
                   onRemove={handleRemoveGoal}
                 />
               ))}
+            </div>
+          </div>
+
+          {/* Daily Revenue Tracking */}
+          <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-xl rounded-2xl border border-white/15 p-8 transition-all duration-500 hover:border-white/25 hover:shadow-xl hover:shadow-emerald-500/10">
+            <div className="flex items-center justify-between mb-8">
+              <div className="space-y-1">
+                <h2 className="text-xl font-bold text-white">
+                  Daily Revenue Tracking
+                </h2>
+                <p className="text-sm text-slate-400">
+                  Actual revenue vs daily goal target
+                </p>
+              </div>
+              <div className="p-2.5 rounded-lg bg-emerald-600/20 text-emerald-300">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7h8m0 0v8m0-8L5.5 19.5M21 7l-8-4-8 4v8l8 4 8-4V7z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <ResponsiveContainer width="100%" height={320}>
+              <LineChart data={dailyRevenueData}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(255,255,255,0.1)"
+                />
+                <XAxis
+                  dataKey="day"
+                  stroke="rgb(148, 163, 184)"
+                  style={{ fontSize: "12px" }}
+                />
+                <YAxis
+                  stroke="rgb(148, 163, 184)"
+                  style={{ fontSize: "12px" }}
+                  label={{
+                    value: "Revenue ($)",
+                    angle: -90,
+                    position: "insideLeft",
+                  }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(15, 23, 42, 0.9)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: "8px",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                  }}
+                  labelStyle={{ color: "#fff" }}
+                  formatter={(value: any) => `$${value.toLocaleString()}`}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="goal"
+                  stroke="rgb(100, 200, 255)"
+                  strokeWidth={2}
+                  name="Daily Goal"
+                  dot={false}
+                  isAnimationActive={false}
+                  opacity={0.6}
+                />
+                <Line
+                  type="natural"
+                  dataKey="actual"
+                  stroke="rgb(34, 197, 94)"
+                  strokeWidth={3}
+                  name="Actual Revenue"
+                  dot={(props) => {
+                    const { cx, cy } = props;
+                    return (
+                      <circle cx={cx} cy={cy} r={4} fill="rgb(34, 197, 94)" />
+                    );
+                  }}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+
+            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+              <div className="space-y-1">
+                <p className="text-xs text-slate-400 font-semibold">
+                  Average Actual
+                </p>
+                <p className="text-lg font-bold text-green-300">$17,410</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-slate-400 font-semibold">
+                  Average Goal
+                </p>
+                <p className="text-lg font-bold text-blue-300">$15,000</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-slate-400 font-semibold">Variance</p>
+                <p className="text-lg font-bold text-emerald-300">+16.1%</p>
+              </div>
             </div>
           </div>
         </main>
