@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTheme } from "@/context/ThemeContext";
 
 interface Notification {
   id: string;
@@ -42,7 +41,6 @@ function DateRangeCalendar({
   onApply,
   onCancel,
 }: DateRangeCalendarProps) {
-  const { theme } = useTheme();
   const [tempStart, setTempStart] = useState(startDate);
   const [tempEnd, setTempEnd] = useState(endDate);
   const [hoverDate, setHoverDate] = useState<string | null>(null);
@@ -129,11 +127,11 @@ function DateRangeCalendar({
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={prevMonth}
-            className={`p-1 rounded transition ${theme === "light" ? "hover:bg-slate-200" : "hover:bg-white/10"}`}
+            className="p-1 rounded transition hover:bg-white/10"
             title="Previous month"
           >
             <svg
-              className={`w-5 h-5 ${theme === "light" ? "text-slate-600 hover:text-slate-800" : "text-slate-400 hover:text-slate-200"}`}
+              className="w-5 h-5 text-slate-400 hover:text-slate-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -146,14 +144,14 @@ function DateRangeCalendar({
               />
             </svg>
           </button>
-          <p className={`text-sm font-semibold ${theme === "light" ? "text-slate-900" : "text-white"}`}>{monthName}</p>
+          <p className="text-sm font-semibold text-white">{monthName}</p>
           <button
             onClick={nextMonth}
-            className={`p-1 rounded transition ${theme === "light" ? "hover:bg-slate-200" : "hover:bg-white/10"}`}
+            className="p-1 rounded transition hover:bg-white/10"
             title="Next month"
           >
             <svg
-              className={`w-5 h-5 ${theme === "light" ? "text-slate-600 hover:text-slate-800" : "text-slate-400 hover:text-slate-200"}`}
+              className="w-5 h-5 text-slate-400 hover:text-slate-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -175,7 +173,7 @@ function DateRangeCalendar({
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
               <div
                 key={day}
-                className={`text-center text-xs font-semibold py-1 ${theme === "light" ? "text-slate-600" : "text-slate-400"}`}
+                className="text-center text-xs font-semibold py-1 text-slate-400"
               >
                 {day}
               </div>
@@ -225,10 +223,8 @@ function DateRangeCalendar({
                         isStart || isEnd
                           ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
                           : inRange || (hoverDate && isInRange(hoverDate))
-                            ? theme === "light"
-                              ? "bg-blue-200 text-blue-800"
-                              : "bg-blue-600/30 text-blue-200"
-                            : theme === "light" ? "text-slate-700 hover:bg-slate-200" : "text-slate-300 hover:bg-white/10"
+                            ? "bg-blue-600/30 text-blue-200"
+                            : "text-slate-300 hover:bg-white/10"
                       }`}
                     >
                       {day}
@@ -254,7 +250,7 @@ function DateRangeCalendar({
         </button>
         <button
           onClick={onCancel}
-          className={`flex-1 px-3 py-2 rounded-lg font-semibold text-xs transition ${theme === "light" ? "bg-slate-200 hover:bg-slate-300 text-slate-700" : "bg-white/10 hover:bg-white/20 text-slate-300"}`}
+          className="flex-1 px-3 py-2 rounded-lg font-semibold text-xs transition bg-white/10 hover:bg-white/20 text-slate-300"
         >
           Cancel
         </button>
@@ -269,7 +265,6 @@ export function Header({
   userEmail,
   onLogout,
 }: HeaderProps) {
-  const { theme, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -557,16 +552,18 @@ export function Header({
     }
   };
   return (
-    <header className="fixed inset-0 top-0 h-16 backdrop-blur-3xl border-b z-50" style={{
-      background: theme === 'dark' 
-        ? 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)'
-        : 'linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%)',
-      borderColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(200,200,200,0.2)'
-    }}>
+    <header
+      className="fixed inset-0 top-0 h-16 backdrop-blur-3xl border-b z-50"
+      style={{
+        background:
+          "linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+        borderColor: "rgba(255,255,255,0.1)",
+      }}
+    >
       <div className="w-screen h-16 px-6 lg:px-8 flex items-center justify-between gap-6">
         {/* Left - Dashboard title */}
         <div className="hidden md:flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${theme === "light" ? "bg-gradient-to-br from-blue-500 to-cyan-500" : "bg-gradient-to-br from-blue-600 to-purple-600"}`}>
+          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600">
             <svg
               className="w-5 h-5 text-white"
               fill="none"
@@ -582,57 +579,30 @@ export function Header({
             </svg>
           </div>
           <div>
-            <h1 className={`text-sm font-bold bg-clip-text text-transparent ${theme === "light" ? "bg-gradient-to-r from-blue-600 to-cyan-600" : "bg-gradient-to-r from-blue-400 to-purple-400"}`} style={{
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
+            <h1
+              className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
+              style={{
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               Velocity
             </h1>
-            <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-600'}`}>Analytics Dashboard</p>
+            <p className="text-xs text-slate-500">Analytics Dashboard</p>
           </div>
         </div>
 
         {/* Right - Date, notifications, profile */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 hover:bg-white/10 dark:hover:bg-white/10 rounded-lg transition-all duration-300 group"
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? (
-              <svg
-                className="w-5 h-5 text-amber-400 group-hover:text-amber-300 transition"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            ) : (
-              <svg
-                className="w-5 h-5 text-slate-600 group-hover:text-slate-700 transition"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            )}
-          </button>
-
           {/* Date Range Picker */}
           <div className="relative" ref={datePickerRef}>
             <button
               onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 group"
-              style={{
-                background: theme === 'dark' 
-                  ? 'linear-gradient(to right, rgba(59, 130, 246, 0.2), rgba(168, 85, 247, 0.2))'
-                  : 'linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1))',
-                borderColor: theme === 'dark' ? 'rgba(96, 165, 250, 0.3)' : 'rgba(96, 165, 250, 0.4)',
-              }}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 group bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-400/30"
+              style={{}}
             >
               <svg
-                className={`w-4 h-4 transition ${theme === 'dark' ? 'text-blue-400 group-hover:text-blue-300' : 'text-blue-600 group-hover:text-blue-700'}`}
+                className="w-4 h-4 transition text-blue-400 group-hover:text-blue-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -644,13 +614,11 @@ export function Header({
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>
+              <span className="text-xs font-medium text-slate-300">
                 {getDateRangeLabel()}
               </span>
               <svg
-                className={`w-3 h-3 transition transform ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'} ${
-                  isDatePickerOpen ? "rotate-180" : ""
-                }`}
+                className="w-3 h-3 transition transform text-blue-400 transition-transform duration-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -666,17 +634,9 @@ export function Header({
 
             {/* Date Picker Dropdown */}
             {isDatePickerOpen && (
-              <div className={`absolute left-0 mt-2 w-80 rounded-lg shadow-xl z-50 overflow-hidden ${
-                theme === "light"
-                  ? "bg-slate-50 border border-slate-300"
-                  : "bg-slate-900 border border-white/20"
-              }`}>
+              <div className="absolute left-0 mt-2 w-80 rounded-lg shadow-xl z-50 overflow-hidden bg-slate-900 border border-white/20">
                 {/* Preset Ranges */}
-                <div className={`px-4 py-3 border-b grid grid-cols-2 gap-2 ${
-                  theme === "light"
-                    ? "border-slate-200"
-                    : "border-white/10"
-                }`}>
+                <div className="px-4 py-3 border-b grid grid-cols-2 gap-2 border-white/10">
                   {[
                     {
                       label: "Last 7 days",
@@ -702,8 +662,9 @@ export function Header({
                       .toISOString()
                       .split("T")[0];
                     const endDate = today.toISOString().split("T")[0];
-                    
-                    const isSelected = localStartDate === startDate && localEndDate === endDate;
+
+                    const isSelected =
+                      localStartDate === startDate && localEndDate === endDate;
 
                     return (
                       <button
@@ -711,12 +672,8 @@ export function Header({
                         onClick={() => applyDateRange(startDate, endDate)}
                         className={`px-3 py-2 text-xs font-semibold rounded transition ${
                           isSelected
-                            ? theme === "light"
-                              ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border border-blue-400"
-                              : "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border border-blue-400"
-                            : theme === "light"
-                              ? "text-slate-700 hover:text-white hover:bg-blue-100 bg-slate-100 border border-slate-300 hover:border-blue-400/50"
-                              : "text-slate-300 hover:text-white bg-white/5 hover:bg-blue-600/20 border border-white/10 hover:border-blue-400/50"
+                            ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border border-blue-400"
+                            : "text-slate-300 hover:text-white bg-white/5 hover:bg-blue-600/20 border border-white/10 hover:border-blue-400/50"
                         }`}
                       >
                         {range.label}
@@ -746,11 +703,7 @@ export function Header({
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              className={`p-2 rounded-lg transition-colors duration-300 relative group ${
-                theme === "light"
-                  ? "hover:bg-slate-200 text-slate-600"
-                  : "hover:bg-white/10 text-slate-400 group-hover:text-slate-300"
-              }`}
+              className="p-2 rounded-lg transition-colors duration-300 relative group hover:bg-white/10 text-slate-400 group-hover:text-slate-300"
             >
               <svg
                 className="w-5 h-5"
@@ -774,28 +727,14 @@ export function Header({
 
             {/* Notifications Dropdown */}
             {isNotificationOpen && (
-              <div className={`absolute right-0 mt-2 w-96 max-h-[600px] overflow-y-auto border rounded-lg shadow-xl z-50 ${
-                theme === "light"
-                  ? "bg-white border-slate-300"
-                  : "bg-slate-900 border-white/20"
-              }`}>
+              <div className="absolute right-0 mt-2 w-96 max-h-[600px] overflow-y-auto border rounded-lg shadow-xl z-50 bg-slate-900 border-white/20">
                 {/* Header */}
-                <div className={`sticky top-0 px-4 py-3 border-b flex items-center justify-between ${
-                  theme === "light"
-                    ? "bg-slate-50 border-slate-300 text-slate-900"
-                    : "bg-slate-900 border-white/10 text-white"
-                }`}>
-                  <h3 className="text-sm font-bold">
-                    Notifications
-                  </h3>
+                <div className="sticky top-0 px-4 py-3 border-b flex items-center justify-between bg-slate-900 border-white/10 text-white">
+                  <h3 className="text-sm font-bold">Notifications</h3>
                   {notifications.length > 0 && (
                     <button
                       onClick={clearAll}
-                      className={`text-xs transition ${
-                        theme === "light"
-                          ? "text-slate-500 hover:text-slate-700"
-                          : "text-slate-400 hover:text-slate-200"
-                      }`}
+                      className="text-xs transition text-slate-400 hover:text-slate-200"
                     >
                       Clear all
                     </button>
@@ -805,20 +744,14 @@ export function Header({
                 {/* Notifications List */}
                 {notifications.length === 0 ? (
                   <div className="px-4 py-8 text-center">
-                    <p className={`text-sm ${
-                      theme === "light" ? "text-slate-500" : "text-slate-400"
-                    }`}>No notifications</p>
+                    <p className="text-sm text-slate-400">No notifications</p>
                   </div>
                 ) : (
-                  <div className={theme === "light" ? "divide-y divide-slate-200" : "divide-y divide-white/10"}>
+                  <div className="divide-y divide-white/10">
                     {notifications.map((notif) => (
                       <div
                         key={notif.id}
-                        className={`px-4 py-3 transition group ${
-                          theme === "light"
-                            ? `hover:bg-slate-100 ${!notif.read ? "bg-blue-100/70" : ""}`
-                            : `hover:bg-white/5 ${!notif.read ? "bg-white/[0.03]" : ""}`
-                        }`}
+                        className={`px-4 py-3 transition group hover:bg-white/5 ${!notif.read ? "bg-white/[0.03]" : ""}`}
                       >
                         <div className="flex items-start gap-3">
                           <div
@@ -827,19 +760,13 @@ export function Header({
                             {getNotificationIconSVG(notif.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-semibold ${
-                              theme === "light" ? "text-slate-900" : "text-white"
-                            }`}>
+                            <p className="text-sm font-semibold text-white">
                               {notif.title}
                             </p>
-                            <p className={`text-xs mt-0.5 line-clamp-2 ${
-                              theme === "light" ? "text-slate-600" : "text-slate-400"
-                            }`}>
+                            <p className="text-xs mt-0.5 line-clamp-2 text-slate-400">
                               {notif.message}
                             </p>
-                            <p className={`text-xs mt-1 ${
-                              theme === "light" ? "text-slate-500" : "text-slate-500"
-                            }`}>
+                            <p className="text-xs mt-1 text-slate-500">
                               {notif.timestamp}
                             </p>
                           </div>
@@ -847,17 +774,11 @@ export function Header({
                             {!notif.read && (
                               <button
                                 onClick={() => markAsRead(notif.id)}
-                                className={`p-1 rounded transition ${
-                                  theme === "light"
-                                    ? "hover:bg-slate-200"
-                                    : "hover:bg-white/20"
-                                }`}
+                                className="p-1 rounded transition hover:bg-white/20"
                                 title="Mark as read"
                               >
                                 <svg
-                                  className={`w-4 h-4 ${
-                                    theme === "light" ? "text-slate-600" : "text-slate-400"
-                                  }`}
+                                  className="w-4 h-4 text-slate-400"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -873,17 +794,11 @@ export function Header({
                             )}
                             <button
                               onClick={() => dismissNotification(notif.id)}
-                              className={`p-1 rounded transition ${
-                                theme === "light"
-                                  ? "hover:bg-slate-200"
-                                  : "hover:bg-white/20"
-                              }`}
+                              className="p-1 rounded transition hover:bg-white/20"
                               title="Dismiss"
                             >
                               <svg
-                                className={`w-4 h-4 ${
-                                  theme === "light" ? "text-slate-600" : "text-slate-400"
-                                }`}
+                                className="w-4 h-4 text-slate-400"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -905,16 +820,8 @@ export function Header({
 
                 {/* Footer */}
                 {notifications.length > 0 && (
-                  <div className={`sticky bottom-0 px-4 py-3 border-t text-center backdrop-blur ${
-                    theme === "light"
-                      ? "bg-white/95 border-slate-300"
-                      : "bg-slate-900/95 border-white/10"
-                  }`}>
-                    <button className={`text-xs transition font-medium ${
-                      theme === "light"
-                        ? "text-blue-600 hover:text-blue-700"
-                        : "text-blue-400 hover:text-blue-300"
-                    }`}>
+                  <div className="sticky bottom-0 px-4 py-3 border-t text-center backdrop-blur bg-slate-900/95 border-white/10">
+                    <button className="text-xs transition font-medium text-blue-400 hover:text-blue-300">
                       View all notifications
                     </button>
                   </div>
@@ -926,11 +833,7 @@ export function Header({
           {/* Settings Icon */}
           <Link
             href="/settings"
-            className={`p-2 rounded-lg transition-colors duration-300 ${
-              theme === "light"
-                ? "hover:bg-slate-200 text-slate-600"
-                : "hover:bg-white/10 text-slate-400 hover:text-slate-300"
-            }`}
+            className="p-2 rounded-lg transition-colors duration-300 hover:bg-white/10 text-slate-400 hover:text-slate-300"
           >
             <svg
               className="w-5 h-5"
@@ -957,18 +860,12 @@ export function Header({
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors duration-300 ${
-                theme === "light"
-                  ? "hover:bg-slate-200"
-                  : "hover:bg-white/10"
-              }`}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors duration-300 hover:bg-white/10"
             >
-              <span className={`text-xs sm:text-sm font-medium hidden sm:inline ${
-                theme === "light" ? "text-slate-700" : "text-slate-300"
-              }`}>
+              <span className="text-xs sm:text-sm font-medium hidden sm:inline text-slate-300">
                 {username}
               </span>
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${theme === "light" ? "bg-gradient-to-br from-blue-500 to-cyan-500" : "bg-gradient-to-br from-blue-400 to-purple-400"}`}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-400">
                 <span className="text-white text-sm font-bold">
                   {username.charAt(0).toUpperCase()}
                 </span>
@@ -977,19 +874,11 @@ export function Header({
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className={`absolute right-0 mt-2 w-48 backdrop-blur border rounded-lg shadow-xl z-50 ${
-                theme === "light"
-                  ? "bg-white/95 border-slate-300"
-                  : "bg-slate-900/95 border-white/20"
-              }`}>
+              <div className="absolute right-0 mt-2 w-48 backdrop-blur border rounded-lg shadow-xl z-50 bg-slate-900/95 border-white/20">
                 <Link
                   href="/account"
                   onClick={() => setIsDropdownOpen(false)}
-                  className={`w-full px-4 py-2.5 text-left text-sm transition border-b flex items-center gap-2 block ${
-                    theme === "light"
-                      ? "text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-slate-200"
-                      : "text-slate-300 hover:bg-white/10 hover:text-white border-white/10"
-                  }`}
+                  className="w-full px-4 py-2.5 text-left text-sm transition border-b flex items-center gap-2 block text-slate-300 hover:bg-white/10 hover:text-white border-white/10"
                 >
                   <svg
                     className="w-4 h-4"
@@ -1008,11 +897,7 @@ export function Header({
                 </Link>
                 <button
                   onClick={onLogout}
-                  className={`w-full px-4 py-2.5 text-left text-sm transition flex items-center gap-2 ${
-                    theme === "light"
-                      ? "text-red-600 hover:bg-red-50 hover:text-red-700"
-                      : "text-red-400 hover:bg-red-600/20 hover:text-red-300"
-                  }`}
+                  className="w-full px-4 py-2.5 text-left text-sm transition flex items-center gap-2 text-red-400 hover:bg-red-600/20 hover:text-red-300"
                 >
                   <svg
                     className="w-4 h-4"
