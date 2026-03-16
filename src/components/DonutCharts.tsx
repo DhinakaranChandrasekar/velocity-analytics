@@ -8,7 +8,6 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { useTheme } from "@/context/ThemeContext";
 import { CustomTooltip } from "./CustomTooltip";
 
 const revenueBySourceData = [
@@ -35,13 +34,8 @@ const COLORS_2 = ["#06b6d4", "#8b5cf6", "#ef4444"];
 const COLORS_3 = ["#10b981", "#f59e0b", "#ef4444"];
 
 export function DonutCharts() {
-  const { theme } = useTheme();
   return (
-    <div className={`backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 transition ${
-      theme === "light"
-        ? "bg-slate-100/40 border-slate-300"
-        : "bg-white/5 border-white/10"
-    }`}>
+    <div className="backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 transition bg-white/5 border-white/10">
       {/* <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 mb-6">
         <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
         Revenue Distribution
@@ -49,9 +43,7 @@ export function DonutCharts() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Revenue by Source */}
         <div>
-          <h4 className={`text-xs font-semibold mb-3 text-center ${
-            theme === "light" ? "text-slate-700" : "text-white"
-          }`}>
+          <h4 className="text-xs font-semibold mb-3 text-center text-white">
             Revenue by Source
           </h4>
           <div style={{ width: "100%", height: "220px" }}>
@@ -93,8 +85,8 @@ export function DonutCharts() {
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: COLORS[i % COLORS.length] }}
                 ></div>
-                <span className={theme === "light" ? "text-slate-600" : "text-slate-300"}>{item.name}</span>
-                <span className={`font-medium ${theme === "light" ? "text-slate-500" : "text-slate-400"}`}>
+                <span className="text-slate-300">{item.name}</span>
+                <span className="font-medium text-slate-400">
                   {item.percentage}%
                 </span>
               </div>
@@ -104,9 +96,7 @@ export function DonutCharts() {
 
         {/* Revenue by Product */}
         <div>
-          <h4 className={`text-xs font-semibold mb-3 text-center ${
-            theme === "light" ? "text-slate-700" : "text-white"
-          }`}>
+          <h4 className="text-xs font-semibold mb-3 text-center text-white">
             Revenue by Product
           </h4>
           <div style={{ width: "100%", height: "220px" }}>
@@ -148,8 +138,8 @@ export function DonutCharts() {
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: COLORS_2[i % COLORS_2.length] }}
                 ></div>
-                <span className={theme === "light" ? "text-slate-600" : "text-slate-300"}>{item.name}</span>
-                <span className={`font-medium ${theme === "light" ? "text-slate-500" : "text-slate-400"}`}>
+                <span className="text-slate-300">{item.name}</span>
+                <span className="font-medium text-slate-400">
                   {item.percentage}%
                 </span>
               </div>
@@ -159,9 +149,7 @@ export function DonutCharts() {
 
         {/* Subscription Tiers */}
         <div>
-          <h4 className={`text-xs font-semibold mb-3 text-center ${
-            theme === "light" ? "text-slate-700" : "text-white"
-          }`}>
+          <h4 className="text-xs font-semibold mb-3 text-center text-white">
             Subscription Tiers
           </h4>
           <div style={{ width: "100%", height: "220px" }}>
@@ -203,8 +191,8 @@ export function DonutCharts() {
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: COLORS_3[i % COLORS_3.length] }}
                 ></div>
-                <span className={theme === "light" ? "text-slate-600" : "text-slate-300"}>{item.name}</span>
-                <span className={`font-medium ${theme === "light" ? "text-slate-500" : "text-slate-400"}`}>
+                <span className="text-slate-300">{item.name}</span>
+                <span className="font-medium text-slate-400">
                   {item.percentage}%
                 </span>
               </div>

@@ -14,6 +14,8 @@ import {
   Cell,
   AreaChart,
   Area,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,7 +27,7 @@ import {
 interface CustomChart {
   id: string;
   title: string;
-  type: "line" | "bar" | "pie" | "area";
+  type: "line" | "bar" | "pie" | "area" | "scatter" | "number" | "combo";
   xField: string;
   yField: string;
   color: string;
@@ -67,12 +69,10 @@ export default function CustomVisualsPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState("");
   const [charts, setCharts] = useState<CustomChart[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedChartId, setSelectedChartId] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingChartId, setEditingChartId] = useState<string | null>(null);
   const [newChartTitle, setNewChartTitle] = useState("");
-  const [newChartType, setNewChartType] = useState<
-    "line" | "bar" | "pie" | "area"
-  >("line");
+  const [newChartType, setNewChartType] = useState<CustomChart["type"]>("line");
   const [newChartXField, setNewChartXField] = useState("month");
   const [newChartYField, setNewChartYField] = useState("revenue");
   const [newChartColor, setNewChartColor] = useState("#3b82f6");
@@ -81,6 +81,31 @@ export default function CustomVisualsPage() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userEmail");
     router.push("/login");
+  };
+
+  const openCreateModal = () => {
+    setEditingChartId(null);
+    setNewChartTitle("");
+    setNewChartType("line");
+    setNewChartXField("month");
+    setNewChartYField("revenue");
+    setNewChartColor("#3b82f6");
+    setModalOpen(true);
+  };
+
+  const openEditModal = (chart: CustomChart) => {
+    setEditingChartId(chart.id);
+    setNewChartTitle(chart.title);
+    setNewChartType(chart.type);
+    setNewChartXField(chart.xField);
+    setNewChartYField(chart.yField);
+    setNewChartColor(chart.color);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingChartId(null);
   };
 
   useEffect(() => {
@@ -95,42 +120,47 @@ export default function CustomVisualsPage() {
     setUserEmail(email || "");
   }, []);
 
-  const addChart = () => {
+  const saveChart = () => {
     if (!newChartTitle) {
       alert("Chart title is required");
       return;
     }
 
-    const newChart: CustomChart = {
-      id: Date.now().toString(),
-      title: newChartTitle,
-      type: newChartType,
-      xField: newChartXField,
-      yField: newChartYField,
-      color: newChartColor,
-    };
+    if (editingChartId) {
+      // Edit existing chart
+      setCharts(
+        charts.map((c) =>
+          c.id === editingChartId
+            ? {
+                ...c,
+                title: newChartTitle,
+                type: newChartType,
+                xField: newChartXField,
+                yField: newChartYField,
+                color: newChartColor,
+              }
+            : c,
+        ),
+      );
+    } else {
+      // Add new chart
+      const newChart: CustomChart = {
+        id: Date.now().toString(),
+        title: newChartTitle,
+        type: newChartType,
+        xField: newChartXField,
+        yField: newChartYField,
+        color: newChartColor,
+      };
+      setCharts([...charts, newChart]);
+    }
 
-    setCharts([...charts, newChart]);
-    setSelectedChartId(newChart.id);
-    setNewChartTitle("");
-    setNewChartType("line");
-    setNewChartXField("month");
-    setNewChartYField("revenue");
-    setNewChartColor("#3b82f6");
+    closeModal();
   };
 
   const deleteChart = (id: string) => {
     setCharts(charts.filter((c) => c.id !== id));
-    if (selectedChartId === id) {
-      setSelectedChartId(charts[0]?.id || null);
-    }
   };
-
-  const updateChart = (id: string, updates: Partial<CustomChart>) => {
-    setCharts(charts.map((c) => (c.id === id ? { ...c, ...updates } : c)));
-  };
-
-  const selectedChart = charts.find((c) => c.id === selectedChartId);
 
   const renderChart = (chart: CustomChart) => {
     const key = `${chart.id}-${chart.type}`;
@@ -252,6 +282,75 @@ export default function CustomVisualsPage() {
             </AreaChart>
           </ResponsiveContainer>
         );
+      case "scatter":
+        return (
+          <ResponsiveContainer width="100%" height={300} key={key}>
+            <ScatterChart
+              margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+              data={mockData}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgba(255,255,255,0.1)"
+              />
+              <XAxis dataKey={chart.xField} stroke="rgba(148,163,184,0.5)" />
+              <YAxis stroke="rgba(148,163,184,0.5)" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                }}
+                labelStyle={{ color: "#fff" }}
+              />
+              <Scatter
+                dataKey={chart.yField}
+                fill={chart.color}
+                shape="circle"
+              />
+            </ScatterChart>
+          </ResponsiveContainer>
+        );
+      case "combo":
+        return (
+          <ResponsiveContainer width="100%" height={300} key={key}>
+            <BarChart data={mockData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgba(255,255,255,0.1)"
+              />
+              <XAxis dataKey={chart.xField} stroke="rgba(148,163,184,0.5)" />
+              <YAxis stroke="rgba(148,163,184,0.5)" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "8px",
+                }}
+                labelStyle={{ color: "#fff" }}
+              />
+              <Legend />
+              <Bar
+                dataKey={chart.yField}
+                fill={chart.color}
+                radius={[8, 8, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        );
+      case "number":
+        return (
+          <div key={key} className="h-80 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                {mockData[mockData.length - 1][
+                  chart.yField as keyof (typeof mockData)[0]
+                ] || 0}
+              </p>
+              <p className="text-slate-400 mt-4">{chart.yField}</p>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -321,11 +420,39 @@ export default function CustomVisualsPage() {
         <main className="relative z-10 flex-1 w-full flex overflow-hidden mt-16">
           {/* Charts Canvas */}
           <div className="flex-1 overflow-auto p-6">
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => router.back()}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all duration-300 text-slate-300 hover:text-white flex-shrink-0"
+                  title="Go back"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">
+                    Custom Visuals
+                  </h1>
+                  <p className="text-slate-400">
+                    Build and customize your analytics visualizations
+                  </p>
+                </div>
+              </div>
               <button
-                onClick={() => router.back()}
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all duration-300 text-slate-300 hover:text-white flex-shrink-0"
-                title="Go back"
+                onClick={openCreateModal}
+                className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg font-semibold transition flex items-center gap-2 h-fit whitespace-nowrap"
               >
                 <svg
                   className="w-5 h-5"
@@ -337,18 +464,11 @@ export default function CustomVisualsPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
+                    d="M12 4v16m8-8H4"
                   />
                 </svg>
+                Add Visual
               </button>
-              <div>
-                <h1 className="text-3xl font-bold text-white mb-2">
-                  Custom Visuals
-                </h1>
-                <p className="text-slate-400">
-                  Build and customize your analytics visualizations
-                </p>
-              </div>
             </div>
 
             {/* Empty State */}
@@ -376,347 +496,333 @@ export default function CustomVisualsPage() {
                   Create your first custom visual to start visualizing your data
                 </p>
                 <button
-                  onClick={() => setSidebarOpen(true)}
+                  onClick={openCreateModal}
                   className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg font-semibold transition"
                 >
-                  + Add Visual
+                  + Create Visual
                 </button>
               </div>
             )}
 
             {/* Charts Grid */}
             {charts.length > 0 && (
-              <div className="grid grid-cols-2 gap-6">
-                {charts.map((chart) => (
-                  <div
-                    key={chart.id}
-                    onClick={() => setSelectedChartId(chart.id)}
-                    className={`bg-white/5 backdrop-blur-xl rounded-2xl border p-6 hover:border-white/30 transition-all duration-300 cursor-pointer ${
-                      selectedChartId === chart.id
-                        ? "border-blue-400/50 ring-1 ring-blue-400/20"
-                        : "border-white/10"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-bold text-white">
-                        {chart.title}
-                      </h3>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteChart(chart.id);
-                        }}
-                        className="p-1 hover:bg-red-600/20 rounded transition text-red-400"
-                      >
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    {renderChart(chart)}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Right Sidebar */}
-          <div
-            className={`fixed right-0 top-16 h-[calc(100vh-4rem)] bg-slate-900/95 border-l border-white/10 transition-all duration-300 overflow-y-auto z-40 ${
-              sidebarOpen ? "w-96" : "w-0"
-            }`}
-          >
-            {sidebarOpen && (
-              <div className="p-6 space-y-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-white">
-                    Chart Settings
-                  </h2>
-                  <button
-                    onClick={() => setSidebarOpen(false)}
-                    className="p-1 hover:bg-white/10 rounded transition"
-                  >
-                    <svg
-                      className="w-5 h-5 text-slate-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                {selectedChart ? (
-                  <div className="space-y-4">
-                    {/* Title */}
-                    <div>
-                      <label className="text-xs font-semibold text-slate-300 block mb-2">
-                        Chart Title
-                      </label>
-                      <input
-                        type="text"
-                        value={selectedChart.title}
-                        onChange={(e) =>
-                          updateChart(selectedChart.id, {
-                            title: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-blue-400/50 transition"
-                      />
-                    </div>
-
-                    {/* Chart Type */}
-                    <div>
-                      <label className="text-xs font-semibold text-slate-300 block mb-2">
-                        Chart Type
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(["line", "bar", "pie", "area"] as const).map(
-                          (type) => (
-                            <button
-                              key={type}
-                              onClick={() =>
-                                updateChart(selectedChart.id, { type })
-                              }
-                              className={`px-3 py-2 rounded-lg text-xs font-semibold transition capitalize ${
-                                selectedChart.type === type
-                                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                                  : "bg-white/10 text-slate-300 hover:bg-white/20 border border-white/10"
-                              }`}
-                            >
-                              {type}
-                            </button>
-                          ),
-                        )}
-                      </div>
-                    </div>
-
-                    {/* X Field */}
-                    <div>
-                      <label className="text-xs font-semibold text-slate-300 block mb-2">
-                        X-Axis Field
-                      </label>
-                      <select
-                        value={selectedChart.xField}
-                        onChange={(e) =>
-                          updateChart(selectedChart.id, {
-                            xField: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-blue-400/50 transition"
-                      >
-                        {availableFields.map((field) => (
-                          <option
-                            key={field.name}
-                            value={field.name}
-                            className="bg-slate-900"
+              <div className="space-y-8">
+                {/* Number Cards */}
+                {charts.filter((c) => c.type === "number").length > 0 && (
+                  <div>
+                    <h2 className="text-lg font-semibold text-white mb-4">
+                      KPI Cards
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                      {charts
+                        .filter((c) => c.type === "number")
+                        .map((chart) => (
+                          <div
+                            key={chart.id}
+                            className="group relative bg-gradient-to-br from-blue-600/20 to-blue-400/5 border-blue-500/30 border rounded-xl p-4 transition-all duration-300 hover:border-white/20 hover:shadow-lg cursor-pointer overflow-hidden"
                           >
-                            {field.name}
-                          </option>
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+                            <div className="relative z-10">
+                              <div className="flex items-start justify-between mb-3">
+                                <p className="text-xs font-semibold text-slate-300 uppercase tracking-wide">
+                                  {chart.title}
+                                </p>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <button
+                                    onClick={() => openEditModal(chart)}
+                                    className="p-1.5 hover:bg-blue-600/20 rounded-lg transition text-blue-400 hover:text-blue-300"
+                                    title="Edit visual"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                      />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={() => deleteChart(chart.id)}
+                                    className="p-1.5 hover:bg-red-600/20 rounded-lg transition text-red-400 hover:text-red-300"
+                                    title="Delete visual"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="flex items-baseline gap-2">
+                                <p className="text-2xl sm:text-3xl font-bold text-white">
+                                  {mockData[mockData.length - 1][
+                                    chart.yField as keyof (typeof mockData)[0]
+                                  ] || 0}
+                                </p>
+                              </div>
+                              <div className="mt-3 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 w-3/4"></div>
+                              </div>
+                            </div>
+                          </div>
                         ))}
-                      </select>
-                    </div>
-
-                    {/* Y Field */}
-                    <div>
-                      <label className="text-xs font-semibold text-slate-300 block mb-2">
-                        Y-Axis / Value Field
-                      </label>
-                      <select
-                        value={selectedChart.yField}
-                        onChange={(e) =>
-                          updateChart(selectedChart.id, {
-                            yField: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-blue-400/50 transition"
-                      >
-                        {availableFields
-                          .filter((f) => f.type === "numeric")
-                          .map((field) => (
-                            <option
-                              key={field.name}
-                              value={field.name}
-                              className="bg-slate-900"
-                            >
-                              {field.name}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-
-                    {/* Color */}
-                    <div>
-                      <label className="text-xs font-semibold text-slate-300 block mb-2">
-                        Color
-                      </label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {COLORS.map((color) => (
-                          <button
-                            key={color}
-                            onClick={() =>
-                              updateChart(selectedChart.id, { color })
-                            }
-                            className={`w-full h-8 rounded-lg transition border-2 ${
-                              selectedChart.color === color
-                                ? "border-white"
-                                : "border-transparent"
-                            }`}
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
                     </div>
                   </div>
-                ) : (
-                  <p className="text-slate-400 text-sm">
-                    Select a chart to edit settings
-                  </p>
                 )}
 
-                {/* Divider */}
-                <div className="border-t border-white/10" />
-
-                {/* Create New Chart */}
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-white">
-                    Create New Chart
-                  </h3>
-
+                {/* Chart Visuals */}
+                {charts.filter((c) => c.type !== "number").length > 0 && (
                   <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-2">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      value={newChartTitle}
-                      onChange={(e) => setNewChartTitle(e.target.value)}
-                      placeholder="e.g., Q1 Revenue"
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-400/50 transition"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-2">
-                      Type
-                    </label>
-                    <select
-                      value={newChartType}
-                      onChange={(e) =>
-                        setNewChartType(e.target.value as typeof newChartType)
-                      }
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-blue-400/50 transition"
-                    >
-                      <option value="line" className="bg-slate-900">
-                        Line
-                      </option>
-                      <option value="bar" className="bg-slate-900">
-                        Bar
-                      </option>
-                      <option value="pie" className="bg-slate-900">
-                        Pie
-                      </option>
-                      <option value="area" className="bg-slate-900">
-                        Area
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-2">
-                      X-Axis
-                    </label>
-                    <select
-                      value={newChartXField}
-                      onChange={(e) => setNewChartXField(e.target.value)}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-blue-400/50 transition"
-                    >
-                      {availableFields.map((field) => (
-                        <option
-                          key={field.name}
-                          value={field.name}
-                          className="bg-slate-900"
-                        >
-                          {field.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-2">
-                      Y-Axis
-                    </label>
-                    <select
-                      value={newChartYField}
-                      onChange={(e) => setNewChartYField(e.target.value)}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-blue-400/50 transition"
-                    >
-                      {availableFields
-                        .filter((f) => f.type === "numeric")
-                        .map((field) => (
-                          <option
-                            key={field.name}
-                            value={field.name}
-                            className="bg-slate-900"
+                    {charts.filter((c) => c.type === "number").length > 0 && (
+                      <h2 className="text-lg font-semibold text-white mb-4">
+                        Charts
+                      </h2>
+                    )}
+                    <div className="grid grid-cols-2 gap-6">
+                      {/* Existing Charts */}
+                      {charts
+                        .filter((c) => c.type !== "number")
+                        .map((chart) => (
+                          <div
+                            key={chart.id}
+                            className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/20 p-6 transition-all duration-300 group"
                           >
-                            {field.name}
-                          </option>
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-lg font-bold text-white">
+                                {chart.title}
+                              </h3>
+                              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                {/* Edit Button */}
+                                <button
+                                  onClick={() => openEditModal(chart)}
+                                  className="p-2 hover:bg-blue-600/20 rounded-lg transition text-blue-400 hover:text-blue-300"
+                                  title="Edit visual"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </button>
+                                {/* Delete Button */}
+                                <button
+                                  onClick={() => deleteChart(chart.id)}
+                                  className="p-2 hover:bg-red-600/20 rounded-lg transition text-red-400 hover:text-red-300"
+                                  title="Delete visual"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                            {renderChart(chart)}
+                          </div>
                         ))}
-                    </select>
+                    </div>
                   </div>
-
-                  <button
-                    onClick={addChart}
-                    className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg font-semibold text-sm transition"
-                  >
-                    + Add Chart
-                  </button>
-                </div>
+                )}
               </div>
             )}
           </div>
-
-          {/* Toggle Sidebar Button */}
-          {!sidebarOpen && (
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="fixed right-6 top-24 p-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg transition z-40 shadow-lg"
-              title="Open sidebar"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-          )}
         </main>
       </div>
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 rounded-2xl border border-white/10 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-slate-900">
+              <h2 className="text-2xl font-bold text-white">
+                {editingChartId ? "Edit Visual" : "Create New Visual"}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="p-1 hover:bg-white/10 rounded transition text-slate-400 hover:text-white"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-5">
+              {/* Title */}
+              <div>
+                <label className="text-sm font-semibold text-slate-300 block mb-2">
+                  Visual Title
+                </label>
+                <input
+                  type="text"
+                  value={newChartTitle}
+                  onChange={(e) => setNewChartTitle(e.target.value)}
+                  placeholder="e.g., Sales Trend"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-400/60 focus:bg-white/10 transition text-sm"
+                />
+              </div>
+
+              {/* Chart Type */}
+              <div>
+                <label className="text-sm font-semibold text-slate-300 block mb-3">
+                  Visualization Type
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(
+                    [
+                      "line",
+                      "bar",
+                      "pie",
+                      "area",
+                      "scatter",
+                      "number",
+                      "combo",
+                    ] as const
+                  ).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setNewChartType(type)}
+                      className={`px-3 py-2.5 rounded-lg text-xs font-semibold transition capitalize ${
+                        newChartType === type
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                          : "bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10"
+                      }`}
+                    >
+                      {type === "scatter" && "Scatter"}
+                      {type === "combo" && "Combo"}
+                      {type === "number" && "Number"}
+                      {type !== "scatter" &&
+                        type !== "combo" &&
+                        type !== "number" &&
+                        type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* X Field */}
+              <div>
+                <label className="text-sm font-semibold text-slate-300 block mb-2">
+                  X-Axis / Category Field
+                </label>
+                <select
+                  value={newChartXField}
+                  onChange={(e) => setNewChartXField(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-400/60 focus:bg-white/10 transition text-sm [&>option]:bg-slate-800"
+                >
+                  {availableFields.map((field) => (
+                    <option key={field.name} value={field.name}>
+                      {field.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Y Field */}
+              <div>
+                <label className="text-sm font-semibold text-slate-300 block mb-2">
+                  Y-Axis / Value Field
+                </label>
+                <select
+                  value={newChartYField}
+                  onChange={(e) => setNewChartYField(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-400/60 focus:bg-white/10 transition text-sm [&>option]:bg-slate-800"
+                >
+                  {availableFields
+                    .filter((f) => f.type === "numeric")
+                    .map((field) => (
+                      <option key={field.name} value={field.name}>
+                        {field.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="text-sm font-semibold text-slate-300 block mb-3">
+                  Color
+                </label>
+                <div className="grid grid-cols-8 gap-2">
+                  {COLORS.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setNewChartColor(color)}
+                      className={`w-full h-8 rounded-lg transition border-2 ${
+                        newChartColor === color
+                          ? "border-white ring-2 ring-blue-400"
+                          : "border-transparent"
+                      }`}
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-3 p-6 border-t border-white/10 bg-slate-950">
+              <button
+                onClick={closeModal}
+                className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white font-semibold transition text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveChart}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-lg font-semibold transition text-sm"
+              >
+                {editingChartId ? "Update Visual" : "Create Visual"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { useTheme } from "@/context/ThemeContext";
 import { CustomTooltip } from "./CustomTooltip";
 
 const monthlyData = [
@@ -74,7 +73,6 @@ const generateYearData = () => {
 type ViewType = "day" | "week" | "month" | "quarter" | "year";
 
 export function MonthlyRevenueChart() {
-  const { theme } = useTheme();
   const [view, setView] = useState<ViewType>("month");
   const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 1));
 
@@ -152,16 +150,10 @@ export function MonthlyRevenueChart() {
   );
 
   return (
-    <div className={`backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 transition ${
-      theme === "light"
-        ? "bg-slate-100/40 border-slate-300"
-        : "bg-white/5 border-white/10"
-    }`}>
+    <div className="backdrop-blur-xl rounded-2xl border p-4 sm:p-5 lg:p-6 transition bg-white/5 border-white/10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h3 className={`text-xs sm:text-sm font-bold flex items-center gap-2 ${
-          theme === "light" ? "text-slate-700" : "text-white"
-        }`}>
-          <div className={`w-2 h-2 rounded-full ${theme === "light" ? "bg-gradient-to-r from-blue-600 to-cyan-600" : "bg-gradient-to-r from-blue-400 to-purple-400"}`}></div>
+        <h3 className="text-xs sm:text-sm font-bold flex items-center gap-2 text-white">
+          <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400"></div>
           Revenue Comparison
         </h3>
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
@@ -175,12 +167,8 @@ export function MonthlyRevenueChart() {
                 }}
                 className={`px-3 py-1 text-xs rounded-lg font-medium transition ${
                   view === v
-                    ? theme === "light"
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
-                      : "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : theme === "light"
-                      ? "bg-slate-200 border border-slate-300 text-slate-700 hover:bg-blue-200 hover:text-white"
-                      : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                    : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -195,17 +183,13 @@ export function MonthlyRevenueChart() {
               }
               className={`p-1.5 rounded-lg transition ${
                 view === "month" || view === "quarter" || view === "year"
-                  ? theme === "light"
-                    ? "bg-slate-200 border border-slate-300 text-slate-400 cursor-not-allowed opacity-50"
-                    : "bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed opacity-50"
-                  : theme === "light"
-                    ? "bg-slate-200 border border-slate-300 hover:bg-slate-300 text-slate-600"
-                    : "bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition text-slate-300"
+                  ? "bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed opacity-50"
+                  : "bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition text-slate-300"
               }`}
             >
               ←
             </button>
-            <span className={`text-xs whitespace-nowrap min-w-fit ${theme === "light" ? "text-slate-600" : "text-slate-400"}`}>
+            <span className="text-xs whitespace-nowrap min-w-fit text-slate-400">
               {getDateRangeLabel()}
             </span>
             <button
@@ -215,12 +199,8 @@ export function MonthlyRevenueChart() {
               }
               className={`p-1.5 rounded-lg transition ${
                 view === "month" || view === "quarter" || view === "year"
-                  ? theme === "light"
-                    ? "bg-slate-200 border border-slate-300 text-slate-400 cursor-not-allowed opacity-50"
-                    : "bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed opacity-50"
-                  : theme === "light"
-                    ? "bg-slate-200 border border-slate-300 hover:bg-slate-300 text-slate-600"
-                    : "bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition text-slate-300"
+                  ? "bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed opacity-50"
+                  : "bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition text-slate-300"
               }`}
             >
               →
@@ -234,15 +214,15 @@ export function MonthlyRevenueChart() {
             data={chartData}
             margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke={theme === "light" ? "rgba(100,116,139,0.1)" : "#ffffff20"} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
             <XAxis
               dataKey={getXAxisDataKey()}
-              stroke={theme === "light" ? "#64748b" : "#94a3b8"}
-              tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8", fontSize: 12 }}
+              stroke="#94a3b8"
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
             />
             <YAxis
-              stroke={theme === "light" ? "#64748b" : "#94a3b8"}
-              tick={{ fill: theme === "light" ? "#64748b" : "#94a3b8", fontSize: 11 }}
+              stroke="#94a3b8"
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
               type="number"
             />
             <Tooltip
@@ -257,7 +237,7 @@ export function MonthlyRevenueChart() {
               wrapperStyle={{
                 paddingTop: "12px",
                 fontSize: "12px",
-                color: theme === "light" ? "#475569" : "#e2e8f0",
+                color: "#e2e8f0",
               }}
               iconType="circle"
               iconSize={12}

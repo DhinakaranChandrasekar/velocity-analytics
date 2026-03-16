@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useTheme } from "@/context/ThemeContext";
+import { AnalysisPresentation } from "./AnalysisPresentation";
 
 interface SidebarProps {
   userEmail: string;
@@ -86,11 +86,49 @@ const menuItems = [
       </svg>
     ),
   },
+  {
+    label: "Activity",
+    href: "/activity",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M13 10V3L4 14h7v7l9-11h-7z"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "Goals",
+    href: "/goals",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export function Sidebar({ userEmail }: SidebarProps) {
-  const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+  const [isPresentationOpen, setIsPresentationOpen] = useState(false);
   const pathname = usePathname();
 
   return (
@@ -99,21 +137,13 @@ export function Sidebar({ userEmail }: SidebarProps) {
       <aside
         className={`fixed left-0 top-0 h-screen transition-[width] duration-300 ease-in-out ${
           isOpen ? "w-64" : "w-14"
-        } z-40 overflow-y-auto scrollbar-hide ${
-          theme === "light"
-            ? "bg-slate-50/80 backdrop-blur-2xl border-slate-300"
-            : "bg-white/3 backdrop-blur-2xl border-white/10"
-        } border-r`}
+        } z-40 overflow-y-auto scrollbar-hide bg-white/3 backdrop-blur-2xl border-white/10 border-r`}
       >
         {/* Sidebar Header */}
-        <div className={`flex items-center justify-between p-4 border-b transition-colors ${
-          theme === "light"
-            ? "border-slate-300"
-            : "border-white/10"
-        } mt-20`}>
+        <div className="flex items-center justify-between p-4 border-b border-white/10 mt-20">
           {isOpen && (
             <div className="flex items-center gap-2">
-              <div className={`p-2 rounded-lg ${theme === "light" ? "bg-gradient-to-br from-blue-500 to-cyan-500" : "bg-gradient-to-br from-blue-600 to-purple-600"}`}>
+              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -129,20 +159,20 @@ export function Sidebar({ userEmail }: SidebarProps) {
                 </svg>
               </div>
               <div>
-                <h2 className={`text-sm font-bold bg-clip-text text-transparent ${theme === "light" ? "bg-gradient-to-r from-blue-600 to-cyan-600" : "bg-gradient-to-r from-blue-400 to-purple-400"}`}>
+                <h2 className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
                   Velocity
                 </h2>
-                <p className={`text-xs ${theme === "light" ? "text-slate-600" : "text-slate-400"}`}>Analytics</p>
+                <p className="text-xs text-slate-400">Analytics</p>
               </div>
             </div>
           )}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`p-1 rounded-lg transition-all duration-300 ${theme === "light" ? "hover:bg-slate-200" : "hover:bg-white/10"}`}
+            className="p-1 rounded-lg transition-all duration-300 hover:bg-white/10"
             title={isOpen ? "Collapse" : "Expand"}
           >
             <svg
-              className={`w-5 h-5 transition-transform duration-500 ${theme === "light" ? "text-slate-600" : "text-slate-400"}`}
+              className="w-5 h-5 transition-transform duration-500 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -170,28 +200,56 @@ export function Sidebar({ userEmail }: SidebarProps) {
                 href={item.href}
                 className={`flex items-center ${isOpen ? "justify-start gap-3" : "justify-center"} px-3 py-2.5 rounded-lg transition-all duration-300 ${
                   isActive
-                    ? theme === "light"
-                      ? "bg-blue-100 border border-blue-300 text-blue-700 shadow-lg shadow-blue-200/50"
-                      : "bg-gradient-to-r from-blue-600/30 to-purple-600/20 border border-blue-400/40 text-blue-300 shadow-lg shadow-blue-500/10"
-                    : theme === "light"
-                      ? "text-slate-700 hover:bg-slate-200 border border-transparent hover:text-slate-900"
-                      : "text-slate-400 hover:bg-white/5 border border-transparent hover:text-slate-200"
+                    ? "bg-gradient-to-r from-blue-600/30 to-purple-600/20 border border-blue-400/40 text-blue-300 shadow-lg shadow-blue-500/10"
+                    : "text-slate-400 hover:bg-white/5 border border-transparent hover:text-slate-200"
                 }`}
                 title={!isOpen ? item.label : ""}
               >
-                <div className={`flex-shrink-0 ${theme === "light" ? "text-slate-600" : "text-slate-300"}`}>{item.icon}</div>
+                <div className="flex-shrink-0 text-slate-300">{item.icon}</div>
                 {isOpen && (
                   <span className="text-sm font-medium">{item.label}</span>
                 )}
               </Link>
             );
           })}
+
+          {/* Presentation Button */}
+          <button
+            onClick={() => setIsPresentationOpen(true)}
+            className={`w-full flex items-center ${isOpen ? "justify-start gap-3" : "justify-center"} px-3 py-2.5 rounded-lg transition-all duration-300 text-slate-400 hover:bg-white/5 border border-transparent hover:text-slate-200`}
+            title={!isOpen ? "Presentation" : ""}
+          >
+            <div className="flex-shrink-0 text-slate-300">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+            </div>
+            {isOpen && (
+              <span className="text-sm font-medium">Presentation</span>
+            )}
+          </button>
         </nav>
       </aside>
 
       {/* Sidebar Spacer */}
       <div
         className={`transition-[width] duration-300 ease-in-out ${isOpen ? "w-64" : "w-14"}`}
+      />
+
+      {/* Presentation Modal */}
+      <AnalysisPresentation
+        isOpen={isPresentationOpen}
+        onClose={() => setIsPresentationOpen(false)}
       />
     </>
   );
