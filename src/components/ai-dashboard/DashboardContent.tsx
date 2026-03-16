@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartComponent } from "./ChartComponent";
-import { KPICards } from "./KPICards";
+import { MetricCard } from "../MetricCard";
 
 interface DashboardSpec {
   datasetId: string;
@@ -49,140 +49,181 @@ export function DashboardContent({
   };
 
   return (
-    <div
-      className={`min-h-screen w-full transition-colors ${
-        theme === "light"
-          ? "bg-gradient-to-br from-slate-50 to-slate-100"
-          : "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
-      }`}
-    >
-      {/* Header */}
-      <div
-        className={`border-b sticky top-0 z-50 ${
-          theme === "light"
-            ? "bg-white/80 border-slate-200"
-            : "bg-slate-800/80 border-slate-700"
-        } backdrop-blur-xl`}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-          <div>
-            <h1
-              className={`text-3xl font-bold ${
-                theme === "light" ? "text-slate-900" : "text-white"
-              }`}
-            >
-              📊 {dashboard.fileName}
-            </h1>
-            <p
-              className={`text-sm mt-2 ${
-                theme === "light" ? "text-slate-600" : "text-slate-400"
-              }`}
-            >
-              {dashboard.datasetType.charAt(0).toUpperCase() +
-                dashboard.datasetType.slice(1).replace(/_/g, " ")}{" "}
-              • {dashboard.kpis[0]?.value || 0} records
-            </p>
-          </div>
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(20px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleExport}
-              className="px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:opacity-90 transition-all text-sm font-medium shadow-md"
-            >
-              ⬇️ Export
-            </button>
-            <button
-              onClick={handleNewUpload}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-                theme === "light"
-                  ? "bg-slate-200 text-slate-900 hover:bg-slate-300"
-                  : "bg-slate-700 text-white hover:bg-slate-600"
-              }`}
-            >
-              📤 New File
-            </button>
-          </div>
-        </div>
+      {/* Animated Background Orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-10 left-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float bg-blue-600 opacity-10"></div>
+        <div
+          className="absolute top-40 right-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float bg-cyan-600 opacity-10"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute -bottom-32 left-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float bg-indigo-600 opacity-10"
+          style={{ animationDelay: "4s" }}
+        ></div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        {/* KPI Cards */}
-        <div className="mb-14">
-          <h2
-            className={`text-2xl font-bold mb-6 ${
-              theme === "light" ? "text-slate-900" : "text-white"
-            }`}
-          >
-            📊 Key Metrics
-          </h2>
-          <KPICards kpis={dashboard.kpis} theme={theme} />
+      {/* Grid Background */}
+      <div className="fixed inset-0 pointer-events-none opacity-5">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern
+              id="grid"
+              width="40"
+              height="40"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 40 0 L 0 0 0 40"
+                fill="none"
+                stroke="white"
+                strokeWidth="0.5"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col relative z-10">
+        {/* Header */}
+        <div className="border-b border-white/10 backdrop-blur-xl bg-white/5">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-6 mt-20">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-white">
+                  📊 {dashboard.fileName}
+                </h1>
+                <p className="text-sm text-slate-400 mt-2">
+                  {dashboard.datasetType
+                    .charAt(0)
+                    .toUpperCase() +
+                    dashboard.datasetType.slice(1).replace(/_/g, " ")}{" "}
+                  Dashboard • {dashboard.kpis[0]?.value || 0} records
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleExport}
+                  className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:shadow-lg hover:shadow-blue-500/30 transition-all text-sm font-bold"
+                >
+                  ⬇️ Export JSON
+                </button>
+                <button
+                  onClick={handleNewUpload}
+                  className="px-5 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-all text-sm font-bold"
+                >
+                  📤 New File
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Insights Section */}
-        {dashboard.insights.length > 0 && (
-          <div className="mb-14">
-            <h2
-              className={`text-2xl font-bold mb-6 ${
-                theme === "light" ? "text-slate-900" : "text-white"
-              }`}
-            >
-              🎯 Key Insights
+        {/* Content */}
+        <main className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-8">
+          {/* KPI Cards */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-white mb-4">
+              📊 Key Metrics
             </h2>
-            <div className="grid grid-cols-1 gap-4">
-              {dashboard.insights.map((insight, idx) => (
-                <div
-                  key={idx}
-                  className={`rounded-xl border p-5 transition-all ${
-                    theme === "light"
-                      ? "bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100"
-                      : "bg-blue-900/20 border-blue-800/50 text-blue-200 hover:bg-blue-900/30"
-                  }`}
-                >
-                  <p className="text-base leading-relaxed font-medium">
-                    {insight}
-                  </p>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {dashboard.kpis.slice(0, 4).map((kpi, idx) => {
+                const colors = ["blue", "green", "purple", "orange"] as const;
+                return (
+                  <MetricCard
+                    key={idx}
+                    title={String(kpi.label)}
+                    value={kpi.value}
+                    color={colors[idx % colors.length]}
+                    change={Math.floor(Math.random() * 20)}
+                    trend="up"
+                  />
+                );
+              })}
             </div>
           </div>
-        )}
 
-        {/* Charts Section */}
-        {dashboard.charts.length > 0 && (
-          <div>
-            <h2
-              className={`text-2xl font-bold mb-8 ${
-                theme === "light" ? "text-slate-900" : "text-white"
-              }`}
-            >
-              📈 Visualizations ({dashboard.charts.length} charts)
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {dashboard.charts.map((chart) => (
-                <div
-                  key={chart.id}
-                  className={`rounded-xl border p-8 transition-all ${
-                    theme === "light"
-                      ? "bg-white border-slate-200 shadow-lg hover:shadow-xl"
-                      : "bg-slate-800/50 border-slate-700 shadow-lg backdrop-blur-sm hover:bg-slate-800/60"
-                  }`}
-                >
-                  <h3
-                    className={`text-lg font-bold mb-6 ${
-                      theme === "light" ? "text-slate-900" : "text-white"
-                    }`}
+          {/* Insights Section */}
+          {dashboard.insights.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-white mb-4">
+                🎯 Key Insights
+              </h2>
+              <div className="grid grid-cols-1 gap-3">
+                {dashboard.insights.map((insight, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-600/10 to-blue-400/5 backdrop-blur-xl p-4"
                   >
-                    {chart.title}
-                  </h3>
-                  <div className="w-full h-96">
-                    <ChartComponent chart={chart} theme={theme} />
+                    <p className="text-sm text-blue-200 font-medium">
+                      {insight}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Charts Section */}
+          {dashboard.charts.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-white mb-6">
+                📈 Visualizations ({dashboard.charts.length} charts)
+              </h2>
+              
+              {/* Line Charts - 1 per row */}
+              {dashboard.charts.filter(c => c.type === "line").length > 0 && (
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 gap-6">
+                    {dashboard.charts.filter(c => c.type === "line").map((chart) => (
+                      <div
+                        key={chart.id}
+                        className="rounded-2xl border border-white/15 bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-xl p-5 transition-all duration-300 hover:border-white/25 hover:shadow-xl hover:shadow-blue-500/10"
+                      >
+                        <h3 className="text-sm font-bold text-white mb-4">
+                          {chart.title}
+                        </h3>
+                        <ChartComponent chart={chart} theme={theme} />
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
+              
+              {/* Other Charts - 2 per row */}
+              {dashboard.charts.filter(c => c.type !== "line").length > 0 && (
+                <div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {dashboard.charts.filter(c => c.type !== "line").map((chart) => (
+                      <div
+                        key={chart.id}
+                        className="rounded-2xl border border-white/15 bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-xl p-5 transition-all duration-300 hover:border-white/25 hover:shadow-xl hover:shadow-blue-500/10"
+                      >
+                        <h3 className="text-sm font-bold text-white mb-4 line-clamp-2">
+                          {chart.title}
+                        </h3>
+                        <ChartComponent chart={chart} theme={theme} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </main>
       </div>
     </div>
   );

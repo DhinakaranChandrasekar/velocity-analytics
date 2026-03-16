@@ -208,9 +208,17 @@ export default function GeographicAnalytics() {
               stroke="rgb(34, 197, 94)"
               strokeWidth={3}
               name="Actual Revenue"
-              dot={(props) => {
-                const { cx, cy } = props;
-                return <circle cx={cx} cy={cy} r={4} fill="rgb(34, 197, 94)" />;
+              dot={(props: any) => {
+                const { cx, cy, key } = props;
+                return (
+                  <circle
+                    key={key}
+                    cx={cx}
+                    cy={cy}
+                    r={4}
+                    fill="rgb(34, 197, 94)"
+                  />
+                );
               }}
               isAnimationActive={false}
             />

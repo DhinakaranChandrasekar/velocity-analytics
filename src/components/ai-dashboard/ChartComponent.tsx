@@ -45,22 +45,22 @@ const COLORS = [
 ];
 
 export function ChartComponent({ chart, theme }: ChartComponentProps) {
-  const textColor = theme === "light" ? "#334155" : "#cbd5e1";
-  const gridColor = theme === "light" ? "#e2e8f0" : "#475569";
-  const tooltipBg = theme === "light" ? "#ffffff" : "#1e293b";
-  const tooltipBorder = theme === "light" ? "#e2e8f0" : "#475569";
+  const textColor = "#cbd5e1";
+  const gridColor = "rgba(148, 163, 184, 0.1)";
+  const tooltipBg = "rgba(15, 23, 42, 0.95)";
+  const tooltipBorder = "rgba(148, 163, 184, 0.2)";
 
   const chartProps = {
-    margin: { top: 10, right: 30, left: 0, bottom: 10 },
+    margin: { top: 5, right: 20, left: 0, bottom: 5 },
   };
 
   if (chart.type === "line") {
     return (
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={280}>
         <LineChart data={chart.data} {...chartProps}>
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-          <XAxis dataKey={chart.xAxis} stroke={textColor} />
-          <YAxis stroke={textColor} />
+          <XAxis dataKey={chart.xAxis} stroke={textColor} style={{ fontSize: "12px" }} />
+          <YAxis stroke={textColor} style={{ fontSize: "12px" }} />
           <Tooltip
             contentStyle={{
               backgroundColor: tooltipBg,
@@ -69,14 +69,13 @@ export function ChartComponent({ chart, theme }: ChartComponentProps) {
             }}
             labelStyle={{ color: textColor }}
           />
-          <Legend />
           <Line
             type="monotone"
             dataKey={chart.yAxis}
-            stroke="#6366f1"
-            strokeWidth={2}
-            dot={{ fill: "#6366f1", r: 4 }}
-            activeDot={{ r: 6 }}
+            stroke="#3b82f6"
+            strokeWidth={3}
+            dot={false}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -85,11 +84,11 @@ export function ChartComponent({ chart, theme }: ChartComponentProps) {
 
   if (chart.type === "bar") {
     return (
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={280}>
         <BarChart data={chart.data} {...chartProps}>
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-          <XAxis dataKey={chart.xAxis} stroke={textColor} />
-          <YAxis stroke={textColor} />
+          <XAxis dataKey={chart.xAxis} stroke={textColor} style={{ fontSize: "11px" }} angle={-30} textAnchor="end" height={60} />
+          <YAxis stroke={textColor} style={{ fontSize: "12px" }} />
           <Tooltip
             contentStyle={{
               backgroundColor: tooltipBg,
@@ -97,9 +96,9 @@ export function ChartComponent({ chart, theme }: ChartComponentProps) {
               borderRadius: "8px",
             }}
             labelStyle={{ color: textColor }}
+            formatter={(value: any) => value.toLocaleString()}
           />
-          <Legend />
-          <Bar dataKey={chart.yAxis} fill="#6366f1" radius={[8, 8, 0, 0]} />
+          <Bar dataKey={chart.yAxis} fill="#06b6d4" radius={[8, 8, 0, 0]} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     );
@@ -107,17 +106,17 @@ export function ChartComponent({ chart, theme }: ChartComponentProps) {
 
   if (chart.type === "area") {
     return (
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={280}>
         <AreaChart data={chart.data} {...chartProps}>
           <defs>
             <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#6366f1" stopOpacity={0.1} />
+              <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-          <XAxis dataKey={chart.xAxis} stroke={textColor} />
-          <YAxis stroke={textColor} />
+          <XAxis dataKey={chart.xAxis} stroke={textColor} style={{ fontSize: "12px" }} />
+          <YAxis stroke={textColor} style={{ fontSize: "12px" }} />
           <Tooltip
             contentStyle={{
               backgroundColor: tooltipBg,
@@ -125,13 +124,16 @@ export function ChartComponent({ chart, theme }: ChartComponentProps) {
               borderRadius: "8px",
             }}
             labelStyle={{ color: textColor }}
+            formatter={(value: any) => value.toLocaleString()}
           />
           <Area
             type="monotone"
             dataKey={chart.yAxis}
-            stroke="#6366f1"
+            stroke="#10b981"
+            strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorArea)"
+            isAnimationActive={false}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -140,7 +142,7 @@ export function ChartComponent({ chart, theme }: ChartComponentProps) {
 
   if (chart.type === "pie") {
     return (
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie
             data={chart.data}

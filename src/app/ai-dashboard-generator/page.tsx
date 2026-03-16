@@ -74,102 +74,134 @@ export default function AIDashboardGenerator() {
 
   // Show upload screen
   return (
-    <main
-      className={`min-h-screen flex items-center justify-center p-6 ${
-        theme === "light"
-          ? "bg-gradient-to-br from-slate-50 to-slate-100"
-          : "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
-      }`}
-    >
-      <div className="w-full max-w-md">
-        {/* Logo/Header */}
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-4">
-            <div
-              className={`p-4 rounded-2xl ${
-                theme === "light"
-                  ? "bg-gradient-to-br from-indigo-500 to-purple-500"
-                  : "bg-gradient-to-br from-indigo-600 to-purple-600"
-              }`}
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(20px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Animated Background Orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-10 left-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float bg-blue-600 opacity-10"></div>
+        <div
+          className="absolute top-40 right-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float bg-cyan-600 opacity-10"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute -bottom-32 left-1/2 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-float bg-indigo-600 opacity-10"
+          style={{ animationDelay: "4s" }}
+        ></div>
+      </div>
+
+      {/* Grid Background */}
+      <div className="fixed inset-0 pointer-events-none opacity-5">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern
+              id="grid"
+              width="40"
+              height="40"
+              patternUnits="userSpaceOnUse"
             >
-              <svg
-                className="w-8 h-8 text-white"
+              <path
+                d="M 40 0 L 0 0 0 40"
                 fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
+                stroke="white"
+                strokeWidth="0.5"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+
+      {/* Main Content - Centered */}
+      <div className="flex-1 flex flex-col relative z-10">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
+          <div className="w-full max-w-2xl">
+            {/* Title Section */}
+            <div className="mb-12 text-center">
+              <div className="flex justify-center mb-6">
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-indigo-600/30 to-purple-600/20 border border-indigo-400/30">
+                  <svg
+                    className="w-8 h-8 text-indigo-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 mb-3">
+                AI Dashboard Generator
+              </h1>
+              <p className="text-sm sm:text-base text-slate-400 max-w-lg mx-auto">
+                Upload a CSV file and instantly get professional dashboards with smart visualizations and actionable insights
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-8 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300">
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            {/* Upload Widget */}
+            <div className="mb-8">
+              <CSVUploadWidget
+                onUpload={handleFileUpload}
+                isLoading={isLoading}
+                theme={theme}
+              />
+            </div>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-xl p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-xl">📊</span>
+                  <h3 className="font-semibold text-white">Smart Charts</h3>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Auto-detects data types and generates 5-8 relevant visualizations
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-xl p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-xl">🎯</span>
+                  <h3 className="font-semibold text-white">Deep Insights</h3>
+                </div>
+                <p className="text-xs text-slate-400">
+                  AI-powered analysis reveals trends, patterns, and metrics
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-xl p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-xl">⚡</span>
+                  <h3 className="font-semibold text-white">Instant Results</h3>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Get professional dashboards in seconds, ready to export
+                </p>
+              </div>
             </div>
           </div>
-          <h1
-            className={`text-3xl font-bold mb-2 ${
-              theme === "light" ? "text-slate-900" : "text-white"
-            }`}
-          >
-            AI Dashboard Generator
-          </h1>
-          <p
-            className={`text-base ${
-              theme === "light" ? "text-slate-600" : "text-slate-400"
-            }`}
-          >
-            Upload a CSV and get instant professional dashboards
-          </p>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div
-            className={`rounded-xl border p-4 mb-6 ${
-              theme === "light"
-                ? "bg-red-50 border-red-200 text-red-800"
-                : "bg-red-900/20 border-red-800/40 text-red-300"
-            }`}
-          >
-            <p className="text-sm font-medium">{error}</p>
-          </div>
-        )}
-
-        {/* Upload Widget */}
-        <CSVUploadWidget
-          onUpload={handleFileUpload}
-          isLoading={isLoading}
-          theme={theme}
-        />
-
-        {/* Info */}
-        <div
-          className={`mt-8 p-4 rounded-xl border ${
-            theme === "light"
-              ? "bg-blue-50 border-blue-200"
-              : "bg-blue-900/20 border-blue-800/40"
-          }`}
-        >
-          <h3
-            className={`font-semibold text-sm mb-3 ${
-              theme === "light" ? "text-blue-900" : "text-blue-300"
-            }`}
-          >
-            📋 Tips:
-          </h3>
-          <ul
-            className={`text-xs space-y-2 ${
-              theme === "light" ? "text-blue-800" : "text-blue-400"
-            }`}
-          >
-            <li>• Use CSV files with 100+ rows</li>
-            <li>• Include headers in the first row</li>
-            <li>• Mix numeric and categorical data</li>
-            <li>• Max 50MB file size</li>
-          </ul>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
